@@ -1,0 +1,15 @@
+{
+    "name": "wscore/pages",
+    "description": "page controller for legacy and simple php scripts.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Asao",
+            "email": "kamei@workspot.jp"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+
+    }
+}
