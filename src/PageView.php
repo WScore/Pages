@@ -52,6 +52,19 @@ class PageView implements \ArrayAccess
     }
 
     /**
+     * @param array|mixed $contents
+     */
+    function assign( $contents )
+    {
+        if( !$contents ) return;
+        if( is_array( $contents ) ) {
+            $this->contents = $contents + $this->contents;
+        } else {
+            $this->contents = $contents;
+        }
+    }
+
+    /**
      * @param string     $key
      * @param null|mixed $default
      * @return mixed
