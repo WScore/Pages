@@ -11,14 +11,24 @@ class PageView implements \ArrayAccess
     const ERROR    = '400';
     const CRITICAL = '500';
 
+    /**
+     * for messages. 
+     * 
+     * @var bool
+     */
     protected $error   = false;
+    /** @var string  */
     protected $message = '';
-    protected $data    = array();
 
-    protected $location;
+    /**
+     * 
+     * @var array
+     */
+    protected $contents    = array();
 
     // +----------------------------------------------------------------------+
     //  Response and locations
+    //  a bit like a Response class. 
     // +----------------------------------------------------------------------+
     /**
      * @param string $url
@@ -30,7 +40,7 @@ class PageView implements \ArrayAccess
     }
 
     // +----------------------------------------------------------------------+
-    //  managing variables
+    //  managing variables for a page view. 
     // +----------------------------------------------------------------------+
     /**
      * @param $key
@@ -38,7 +48,7 @@ class PageView implements \ArrayAccess
      */
     function set( $key, $value )
     {
-        $this->data[ $key ] = $value;
+        $this->contents[ $key ] = $value;
     }
 
     /**
@@ -48,8 +58,8 @@ class PageView implements \ArrayAccess
      */
     function get( $key, $default=null )
     {
-        if( isset( $this->data[$key] ) ) {
-            return $this->data[$key];
+        if( isset( $this->contents[$key] ) ) {
+            return $this->contents[$key];
         }
         return $default;
     }
@@ -96,7 +106,8 @@ class PageView implements \ArrayAccess
     }
 
     // +----------------------------------------------------------------------+
-    //  managing errors and messages
+    //  managing errors and messages.
+    //  should this be a different class?
     // +----------------------------------------------------------------------+
     /**
      * @param string $message
@@ -158,12 +169,14 @@ class PageView implements \ArrayAccess
         return $html;
     }
     // +----------------------------------------------------------------------+
+    //  for ArrayAccess
+    // +----------------------------------------------------------------------+
     /**
      * Whether a offset exists
      */
     public function offsetExists( $offset )
     {
-        return array_key_exists( $offset, $this->data );
+        return array_key_exists( $offset, $this->contents );
     }
 
     /**
@@ -171,7 +184,7 @@ class PageView implements \ArrayAccess
      */
     public function offsetGet( $offset )
     {
-        return array_key_exists( $offset, $this->data ) ? $this->data[$offset] : null;
+        return array_key_exists( $offset, $this->contents ) ? $this->contents[$offset] : null;
     }
 
     /**
@@ -179,7 +192,7 @@ class PageView implements \ArrayAccess
      */
     public function offsetSet( $offset, $value )
     {
-        $this->data[$offset] = $value;
+        $this->contents[$offset] = $value;
     }
 
     /**
@@ -188,7 +201,7 @@ class PageView implements \ArrayAccess
     public function offsetUnset( $offset )
     {
         if( $this->offsetExists($offset) ) {
-            unset( $this->data[$offset] );
+            unset( $this->contents[$offset] );
         }
     }
 }
