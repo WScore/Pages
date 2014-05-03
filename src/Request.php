@@ -1,7 +1,7 @@
 <?php
 namespace WScore\Pages;
 
-class PageRequest
+class Request
 {
     /**
      * @param string $key

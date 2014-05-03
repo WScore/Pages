@@ -15,7 +15,7 @@ class Dispatch
     protected $controller;
 
     /**
-     * @var PageRequest
+     * @var Request
      */
     protected $request;
 
@@ -28,7 +28,7 @@ class Dispatch
     //  construction of dispatch and setting controller object.
     // +----------------------------------------------------------------------+
     /**
-     * @param PageRequest $request
+     * @param Request $request
      * @param PageView    $view
      */
     public function __construct( $request, $view )
@@ -44,7 +44,7 @@ class Dispatch
     {
         $controller->inject( 'view',    $this->view );
         $controller->inject( 'request', $this->request );
-        $controller->inject( 'session', PageSession::getInstance() );
+        $controller->inject( 'session', Session::getInstance() );
         $this->controller = $controller;
     }
 
@@ -56,7 +56,7 @@ class Dispatch
     {
         /** @var self $me */
         $me = new static(
-            new PageRequest(),
+            new Request(),
             new PageView()
         );
         $me->setController( $controller );

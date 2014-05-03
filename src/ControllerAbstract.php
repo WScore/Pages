@@ -9,12 +9,12 @@ abstract class ControllerAbstract
     protected $view;
 
     /**
-     * @var PageRequest
+     * @var Request
      */
     protected $request;
 
     /**
-     * @var PageSession
+     * @var Session
      */
     protected $session;
 
@@ -66,7 +66,7 @@ abstract class ControllerAbstract
     protected function pushToken()
     {
         $token = $this->session->pushToken();
-        $this->view->set( PageSession::TOKEN_ID, $token );
+        $this->view->set( Session::TOKEN_ID, $token );
     }
 
     /**
@@ -74,7 +74,7 @@ abstract class ControllerAbstract
      */
     protected function verifyToken()
     {
-        $token = $this->request->getCode( PageSession::TOKEN_ID );
+        $token = $this->request->getCode( Session::TOKEN_ID );
         if( !$this->session->verifyToken( $token ) ) {
             return false;
         }

@@ -1,7 +1,7 @@
 <?php
 namespace WScore\Pages;
 
-class PageSession
+class Session
 {
     const FLASH_ID = '_flash';
     const TOKEN_ID = '_token';
@@ -32,7 +32,7 @@ class PageSession
         if( !isset( $_SESSION ) ) {
             session_start();
         }
-        /** @var PageSession $session */
+        /** @var Session $session */
         $session = new static();
         $session->setData( $_SESSION );
         return $session;
