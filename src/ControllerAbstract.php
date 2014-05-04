@@ -93,6 +93,25 @@ abstract class ControllerAbstract
     }
 
     // +----------------------------------------------------------------------+
+    //  messages and errors. 
+    // +----------------------------------------------------------------------+
+    /**
+     * @param string $message
+     */
+    protected function message( $message )
+    {
+        $this->view->message( $message );
+    }
+
+    /**
+     * @param string $message
+     */
+    protected function error( $message )
+    {
+        $this->view->error( $message );
+    }
+    
+    // +----------------------------------------------------------------------+
     //  flash messages
     // +----------------------------------------------------------------------+
     /**
