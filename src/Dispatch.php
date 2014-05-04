@@ -84,7 +84,7 @@ class Dispatch
             $parameters[$key] = $val;
         }
         $refMethod->setAccessible(true);
-        $refMethod->invokeArgs( $controller, $parameters );
+        return $refMethod->invokeArgs( $controller, $parameters );
     }
 
     /**
@@ -101,8 +101,9 @@ class Dispatch
             if( !method_exists( $this->controller, $execMethod ) ) {
                 throw new \RuntimeException( 'no method: ' . $method );
             }
-            $contents = $this->execMethod( $execMethod );
-            $this->view->assign( $contents );
+            if( $contents = $this->execMethod( $execMethod ) ) {
+                $this->view->assign( $contents );
+            }
 
         } catch( \Exception $e ) {
             $this->view->critical( $e->getMessage() );
