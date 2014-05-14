@@ -17,7 +17,10 @@ class PageView implements \ArrayAccess
      * @var bool
      */
     protected $error   = false;
-    /** @var string  */
+
+    /**
+     * @var string
+     */
     protected $message = '';
 
     /**
@@ -50,6 +53,17 @@ class PageView implements \ArrayAccess
     {
         $this->contents[ $key ] = $value;
     }
+    /** outdated method. */
+    function add( $k, $v) {$this->set($k,$v);}
+
+    /**
+     * @param $key
+     * @return bool
+     */
+    function exists( $key )
+    {
+        return array_key_exists( $key, $this->contents );
+    }
 
     /**
      * @param array|mixed $contents
@@ -59,8 +73,6 @@ class PageView implements \ArrayAccess
         if( !$contents ) return;
         if( is_array( $contents ) ) {
             $this->contents = $contents + $this->contents;
-        } else {
-            $this->contents = $contents;
         }
     }
 
@@ -71,22 +83,10 @@ class PageView implements \ArrayAccess
      */
     function get( $key, $default=null )
     {
-        if( isset( $this->contents[$key] ) ) {
+        if( $this->exists($key) ) {
             return $this->contents[$key];
         }
         return $default;
-    }
-
-    /**
-     * @param string $key
-     * @return string
-     */
-    function getHidden( $key )
-    {
-        if( $value = $this->get( $key ) ) {
-            return '<input type="hidden" name="' . "{$key}\" value=\"{$value}\" />";
-        }
-        return '';
     }
 
     /**
@@ -105,6 +105,30 @@ class PageView implements \ArrayAccess
         return $got;
     }
 
+    // +----------------------------------------------------------------------+
+    //  managing html stuff.
+    // +----------------------------------------------------------------------+
+    /**
+     * @param string $key
+     * @return string
+     */
+    function getHidden( $key )
+    {
+        if( $this->exists($key) ) {
+            $value = $this->get( $key );
+            return '<input type="hidden" name="' . "{$key}\" value=\"{$value}\" />";
+        }
+        return '';
+    }
+
+    /**
+     * @param $method
+     */
+    function setMethod($method)
+    {
+        $this->set( '_method', $method );
+    }
+
     /**
      * @param bool $tag
      * @return string
@@ -116,6 +140,68 @@ class PageView implements \ArrayAccess
             $method = $this->getHidden( '_method' );
         }
         return $method;
+    }
+
+    /**
+     * @param bool $tag
+     * @return mixed|string
+     */
+    function getToken( $tag=true )
+    {
+        if( !$this->exists( Session::TOKEN_ID ) ) return '';
+        if( $tag ) {
+            return $this->getHidden( Session::TOKEN_ID );
+        }
+        return $this->get( Session::TOKEN_ID );
+    }
+
+    /**
+     * @param string $value
+     * @param string $key
+     */
+    function setButton($value, $key='_buttonValue')
+    {
+        $this->set( $key, $value);
+    }
+
+    /**
+     * @param string $key
+     * @return string
+     */
+    function getButton($key='_buttonValue')
+    {
+        if( !$value = $this->get($key) ) return '';
+        return '<input type=' . "\"submit\" value=\"{$value}\" />";
+    }
+
+    /**
+     * @param $type
+     */
+    function setSubButton($type)
+    {
+        $this->set( '_subButtonType', $type );
+    }
+
+    /**
+     * @param null $key
+     * @return string
+     */
+    function getSubButton($key=null)
+    {
+        if( !$key ) $key = '_subButtonType';
+        $html = '';
+        $type = $this->get($key);
+        switch( $type ) {
+            case 'reset':
+                $html = '<input type="reset" name="リセット" />';
+                break;
+            case 'back':
+                $html = '<input type="button" name="戻る" onclick="history.back();" />';
+                break;
+            default:
+                break;
+        }
+        return $html;
     }
 
     // +----------------------------------------------------------------------+
