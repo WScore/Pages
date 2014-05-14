@@ -23,6 +23,14 @@ abstract class ControllerAbstract
      */
     protected $modules = array();
 
+    /**
+     * a quick way to setup a view based on method.
+     * ex: [ 'method1' => [ 'key1'=>'value1', ... ], ]
+     *
+     * @var array[]
+     */
+    protected $methodView = array();
+
     // +----------------------------------------------------------------------+
     //  generic helpers
     // +----------------------------------------------------------------------+
@@ -110,7 +118,15 @@ abstract class ControllerAbstract
     {
         $this->view->error( $message );
     }
-    
+
+    /**
+     * @param string $message
+     */
+    protected function critical( $message )
+    {
+        $this->view->critical( $message );
+    }
+
     // +----------------------------------------------------------------------+
     //  flash messages
     // +----------------------------------------------------------------------+
@@ -143,6 +159,23 @@ abstract class ControllerAbstract
             } else {
                 $this->view->message($message);
             }
+        }
+    }
+
+    // +----------------------------------------------------------------------+
+    //  utilities
+    // +----------------------------------------------------------------------+
+    /**
+     * @param $method
+     * @param bool $view
+     */
+    protected function setMethod( $method, $view=true )
+    {
+        $this->view->setMethod( $method );
+        if( $view &&
+            isset( $this->methodView[$method] ) &&
+            is_array( $this->methodView[$method] ) ) {
+            $this->view->assign( $this->methodView[$method] );
         }
     }
 
