@@ -81,10 +81,20 @@ class Dispatch
             $name = $arg->getName();
             $opt  = $arg->isOptional() ? $arg->getDefaultValue() : null;
             $val  = $this->request->get( $name, $opt );
+            $val  = $this->safe( $val );
             $parameters[$key] = $val;
+            $this->view->set( $name, $val );
         }
         $refMethod->setAccessible(true);
         return $refMethod->invokeArgs( $controller, $parameters );
+    }
+
+    protected function safe( $value )
+    {
+        if( preg_match('/^[-_a-zA-Z0-9]*$/', $value ) ) {
+            return $value;
+        }
+        return null;
     }
 
     /**
