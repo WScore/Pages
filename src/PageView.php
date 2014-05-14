@@ -253,6 +253,14 @@ class PageView implements \ArrayAccess
     /**
      * @return string
      */
+    function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * @return string
+     */
     function alert()
     {
         $html = '';
