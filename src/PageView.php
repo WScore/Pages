@@ -193,10 +193,10 @@ class PageView implements \ArrayAccess
         $type = $this->get($key);
         switch( $type ) {
             case 'reset':
-                $html = '<input type="reset" name="リセット" />';
+                $html = '<input type="reset" value="リセット" />';
                 break;
             case 'back':
-                $html = '<input type="button" name="戻る" onclick="history.back();" />';
+                $html = '<input type="button" value="戻る" onclick="history.back();" />';
                 break;
             default:
                 break;
