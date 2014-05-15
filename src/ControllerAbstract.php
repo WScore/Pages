@@ -67,8 +67,9 @@ abstract class ControllerAbstract
 
     /**
      * overwrite this to prepare controller before on* method.
+     * @param string $method
      */
-    public function beginController() {}
+    public function beginController( $method ) {}
 
     /**
      * overwrite this to finish controller after on* method.
