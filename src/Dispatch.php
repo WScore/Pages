@@ -80,7 +80,7 @@ class Dispatch
             $key  = $arg->getPosition();
             $name = $arg->getName();
             $opt  = $arg->isOptional() ? $arg->getDefaultValue() : null;
-            $val  = $this->request->getCode( $name, $opt );
+            $val  = $this->request->get( $name, $opt );
             $parameters[$key] = $val;
             $this->view->set( $name, $val );
         }

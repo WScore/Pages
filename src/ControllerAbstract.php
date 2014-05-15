@@ -179,5 +179,16 @@ abstract class ControllerAbstract
         }
     }
 
+    /**
+     * @param $value
+     * @return bool
+     */
+    protected function isSafe( & $value )
+    {
+        if( !$value ) return false;
+        if( preg_match( '/^[-_a-zA-Z0-9]*$/', $value ) ) return true;
+        return false;
+    }
+
     // +----------------------------------------------------------------------+
 }
