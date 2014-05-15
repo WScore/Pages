@@ -190,5 +190,15 @@ abstract class ControllerAbstract
         return false;
     }
 
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    protected function set( $key, $value )
+    {
+        $this->view->set( $key, $value );
+        return $this;
+    }
     // +----------------------------------------------------------------------+
 }
