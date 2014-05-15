@@ -95,6 +95,7 @@ class Dispatch
     public function execute( $method='_method' )
     {
         $method = $this->request->getMethod( $method );
+        $this->view->setCurrentMethod( $method );
         $execMethod = 'on' . ucwords( $method );
 
         try {
