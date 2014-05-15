@@ -133,6 +133,9 @@ class Session
         if( !isset( $this->data[ static::TOKEN_ID ] ) ) {
             $this->data[ static::TOKEN_ID ] = array();
         }
+        if( !is_array( $this->data[ static::TOKEN_ID ] ) ) {
+            $this->data[ static::TOKEN_ID ] = array($this->data[ static::TOKEN_ID ]);
+        }
         $this->data[ static::TOKEN_ID ][] = $token;
         if( count( $this->data[ static::TOKEN_ID ] ) <= static::MAX_TOKEN ) {
             return;
