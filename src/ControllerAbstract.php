@@ -65,6 +65,16 @@ abstract class ControllerAbstract
         $this->modules[ $name ] = $object;
     }
 
+    /**
+     * overwrite this to prepare controller before on* method.
+     */
+    public function beginController() {}
+
+    /**
+     * overwrite this to finish controller after on* method.
+     */
+    public function finishController() {}
+
     // +----------------------------------------------------------------------+
     //  sort of Response class. 
     // +----------------------------------------------------------------------+

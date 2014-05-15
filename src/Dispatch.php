@@ -102,9 +102,11 @@ class Dispatch
             if( !method_exists( $this->controller, $execMethod ) ) {
                 throw new \RuntimeException( 'no method: ' . $method );
             }
+            $this->controller->beginController();
             if( $contents = $this->execMethod( $execMethod ) ) {
                 $this->view->assign( $contents );
             }
+            $this->controller->finishController();
 
         } catch( \Exception $e ) {
             $this->view->critical( $e->getMessage() );
