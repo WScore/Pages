@@ -111,6 +111,14 @@ abstract class ControllerAbstract
         return true;
     }
 
+    /**
+     *
+     */
+    protected function undoToken()
+    {
+        $this->session->undoToken();
+    }
+
     // +----------------------------------------------------------------------+
     //  messages and errors. 
     // +----------------------------------------------------------------------+

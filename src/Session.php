@@ -17,6 +17,11 @@ class Session
      */
     protected $flashed = array();
 
+    /**
+     * @var string
+     */
+    protected $undo_token;
+
     // +-------------------------------------------------------------+
     /**
      */
@@ -162,7 +167,17 @@ class Session
         $key = array_search( $token, $this->data[ static::TOKEN_ID ] );
         unset( $this->data[ static::TOKEN_ID ][ $key ] );
         $this->data[ static::TOKEN_ID ] = array_values( $this->data[ static::TOKEN_ID ] );
+        $this->undo_token = $token;
         return true;
+    }
+
+    /**
+     *
+     */
+    public function undoToken()
+    {
+        if( !$this->undo_token ) return;
+        $this->_pushToken( $this->undo_token );
     }
     // +----------------------------------------------------------------------+
 }
