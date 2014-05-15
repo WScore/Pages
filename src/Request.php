@@ -4,6 +4,13 @@ namespace WScore\Pages;
 class Request
 {
     /**
+     * key name for overwriting http method.
+     *
+     * @var string
+     */
+    protected $method_name = '_method';
+
+    /**
      * @param string $key
      * @param string $data
      * @param null|mixed $default
@@ -70,12 +77,21 @@ class Request
     }
 
     /**
+     * @param $name
+     */
+    public function setMethodName( $name )
+    {
+        $this->method_name = $name;
+    }
+
+    /**
      * @param null|string $name
      * @return string
      */
-    public function getMethod( $name='_method' )
+    public function getMethod( $name=null )
     {
         $http_method = $_SERVER['REQUEST_METHOD'];
+        if( !$name ) $name = $this->method_name;
         $method = $this->get( $name, $http_method );
         $method = strtolower( $method );
         return $this->safeCode( $method );

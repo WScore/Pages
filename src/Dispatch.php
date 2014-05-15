@@ -20,6 +20,11 @@ class Dispatch
     protected $request;
 
     /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
      * @var PageView
      */
     protected $view;
@@ -29,12 +34,14 @@ class Dispatch
     // +----------------------------------------------------------------------+
     /**
      * @param Request $request
-     * @param PageView    $view
+     * @param PageView $view
+     * @param null|Session $session
      */
-    public function __construct( $request, $view )
+    public function __construct( $request, $view, $session=null )
     {
         $this->request = $request;
         $this->view    = $view;
+        $this->session = $session ?: Session::getInstance();
     }
 
     /**
@@ -44,7 +51,7 @@ class Dispatch
     {
         $controller->inject( 'view',    $this->view );
         $controller->inject( 'request', $this->request );
-        $controller->inject( 'session', Session::getInstance() );
+        $controller->inject( 'session', $this->session );
         $this->controller = $controller;
     }
 
@@ -63,6 +70,29 @@ class Dispatch
         return $me;
     }
 
+    /**
+     * @return PageView
+     */
+    public function getView()
+    {
+        return $this->view;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
+     * @return Session
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
     // +----------------------------------------------------------------------+
     //  execution of controllers. 
     // +----------------------------------------------------------------------+
@@ -92,9 +122,9 @@ class Dispatch
      * @param null|string $method
      * @return PageView
      */
-    public function execute( $method='_method' )
+    public function execute( $method=null )
     {
-        $method = $this->request->getMethod( $method );
+        if( !$method ) $method = $this->request->getMethod();
         $this->view->setCurrentMethod( $method );
         $execMethod = 'on' . ucwords( $method );
 
