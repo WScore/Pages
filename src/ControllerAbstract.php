@@ -31,6 +31,8 @@ abstract class ControllerAbstract
      */
     protected $methodView = array();
 
+    protected $currentView = array();
+
     // +----------------------------------------------------------------------+
     //  generic helpers
     // +----------------------------------------------------------------------+
@@ -69,7 +71,10 @@ abstract class ControllerAbstract
      * overwrite this to prepare controller before on* method.
      * @param string $method
      */
-    public function beginController( $method ) {}
+    public function beginController( $method )
+    {
+        $this->setCurrentMethod( $method );
+    }
 
     /**
      * overwrite this to finish controller after on* method.
@@ -184,6 +189,20 @@ abstract class ControllerAbstract
     // +----------------------------------------------------------------------+
     //  utilities
     // +----------------------------------------------------------------------+
+    /**
+     * @param $method
+     * @param bool $view
+     */
+    protected function setCurrentMethod( $method, $view=true )
+    {
+        $this->view->setCurrentMethod( $method );
+        if( $view &&
+            isset( $this->currentView[$method] ) &&
+            is_array( $this->currentView[$method] ) ) {
+            $this->view->assign( $this->currentView[$method] );
+        }
+    }
+
     /**
      * @param $method
      * @param bool $view
