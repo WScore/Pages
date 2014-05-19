@@ -17,7 +17,7 @@ Not version is set currently.
 
 ```json
 "require": {
-    :wscore/pages":"dev-master"
+    "wscore/pages":"dev-master"
 }
 ```
 
