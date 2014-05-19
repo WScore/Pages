@@ -44,7 +44,7 @@ class MyController extends ControllerAbstract {
 }
 // 2. get dispatcher with factory.
 $page = Factory::getDispatch(
-    new MyController()
+    new MyController( new Dao() )
 );
 // 3. execute controller and get view object.
 $view = $page->execute();
