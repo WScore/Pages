@@ -145,10 +145,11 @@ abstract class ControllerAbstract
 
     /**
      * @param string $message
+     * @throws \RuntimeException
      */
     protected function critical( $message )
     {
-        $this->view->critical( $message );
+        throw new \RuntimeException( $message );
     }
 
     // +----------------------------------------------------------------------+
