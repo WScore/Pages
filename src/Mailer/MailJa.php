@@ -22,11 +22,11 @@ class MailJa
      * @var array
      */
     protected $options = array(
-        'From:' => '',
-        'Reply-To:' => '',
-        'Bcc:' => '',
-        'Cc:' => '',
-        'X-Mailer:' => 'php/5.x',
+        'From' => '',
+        'Reply-To' => '',
+        'Bcc' => '',
+        'Cc' => '',
+        'X-Mailer' => 'php/5.x',
     );
 
     protected static $mailBy = 'JIS';
@@ -99,6 +99,11 @@ class MailJa
     // +----------------------------------------------------------------------+
     //  set up mail content
     // +----------------------------------------------------------------------+
+    public function bulk()
+    {
+        $this->options['Precedence'] = 'bulk';
+    }
+
     /**
      * @param string $to
      * @param string $name
@@ -162,7 +167,6 @@ class MailJa
             $cc = implode(',', $copyTo );
         }
         if( !$cc ) return;
-        $as .= ':';
         if( !isset( $this->options[$as] ) ) {
             $this->options[$as] = '';
         }
@@ -181,8 +185,8 @@ class MailJa
     public function from( $from, $name=null )
     {
         $this->options['From'] = $this->name( $from, $name );
-        if( !$this->options['Reply-To:'] ) {
-            $this->options['Reply-To:'] = $from;
+        if( !$this->options['Reply-To'] ) {
+            $this->options['Reply-To'] = $from;
         }
         return $this;
     }
@@ -225,7 +229,12 @@ class MailJa
      */
     protected function getOption()
     {
-        return implode("\n", $this->options );
+        $option = '';
+        foreach( $this->options as $key => $value ) {
+            if( $option ) $option .= "\n";
+            $option .= "{$key}: {$value}";
+        }
+        return $option;
     }
 
     /**
@@ -246,7 +255,7 @@ class MailJa
      */
     protected function sendMs()
     {
-        $this->options['Content-Type:'] = 'text/plain; charset="ISO-2022-JP"';
+        $this->options['Content-Type'] = 'text/plain; charset="ISO-2022-JP"';
         $option  = $this->getOption();
         $subject = $this->encode( $this->subject );
         $body    = $this->encode( $this->body );
