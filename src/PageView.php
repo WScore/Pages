@@ -362,7 +362,11 @@ class PageView implements \ArrayAccess
      */
     public function offsetGet( $offset )
     {
-        return array_key_exists( $offset, $this->contents ) ? $this->contents[$offset] : null;
+        $value = $this->get( $offset );
+        if( $value && is_string($value) ) {
+            $value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+        }
+        return $value;
     }
 
     /**
