@@ -47,4 +47,19 @@ class PageView_Test extends \PHPUnit_Framework_TestCase
         $this->assertContains( "name=\"$key", $tags );
         $this->assertNotContains( '_set_only', $tags );
     }
+
+    /**
+     * @test
+     */
+    function getHidden_returns_hidden_tag_or_value_or_tag_with_name()
+    {
+        $value = 'testHidden';
+        $key   = 'test';
+        $this->view->set( $key, $value );
+        $this->assertEquals( $value, $this->view->getHidden( $key, false ) );
+        $this->assertContains( "value=\"$value", $this->view->getHidden( $key ) );
+        $this->assertContains( "name=\"$key",    $this->view->getHidden( $key ) );
+        $this->assertContains( "value=\"$value", $this->view->getHidden( $key, 'hide' ) );
+        $this->assertContains( "name=\"hide",    $this->view->getHidden( $key, 'hide' ) );
+    }
 }

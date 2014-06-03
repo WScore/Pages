@@ -141,14 +141,15 @@ class PageView implements \ArrayAccess
     // +----------------------------------------------------------------------+
     /**
      * @param string $key
-     * @param string|null $name
+     * @param string|bool $name
      * @return string
      */
-    function getHidden( $key, $name=null )
+    function getHidden( $key, $name=true )
     {
         if( $this->exists($key) ) {
-            !$name && $name = $key;
             $value = $this->get( $key );
+            if( !$name ) return $value;
+            if( $name === true ) $name = $key;
             return '<input type="hidden" name="' . "{$name}\" value=\"{$value}\" />";
         }
         return '';
@@ -171,24 +172,21 @@ class PageView implements \ArrayAccess
     /**
      * @param $method
      */
-    function setCurrentMethod( $method )
-    {
+    function setCurrentMethod( $method ) {
         $this->set( '_current_method', $method );
     }
 
     /**
      * @return string|null
      */
-    function getCurrentMethod()
-    {
+    function getCurrentMethod() {
         return $this->get( '_current_method' );
     }
 
     /**
      * @param $method
      */
-    function setMethod($method)
-    {
+    function setMethod($method) {
         $this->pass( '_method', $method );
     }
 
@@ -196,20 +194,14 @@ class PageView implements \ArrayAccess
      * @param bool $tag
      * @return string
      */
-    function getMethod( $tag=true )
-    {
-        if( !$method = $this->get( '_method' ) ) return '';
-        if( $tag ) {
-            $method = $this->getHidden( '_method', $tag );
-        }
-        return $method;
+    function getMethod( $tag=true ) {
+        return $this->getHidden( '_method', $tag );
     }
 
     /**
      * @param $token
      */
-    function setToken( $token )
-    {
+    function setToken( $token ) {
         $this->pass( Session::TOKEN_ID, $token );
     }
 
@@ -217,21 +209,15 @@ class PageView implements \ArrayAccess
      * @param bool $tag
      * @return mixed|string
      */
-    function getToken( $tag=true )
-    {
-        if( !$this->exists( Session::TOKEN_ID ) ) return '';
-        if( $tag ) {
-            return $this->getHidden( Session::TOKEN_ID );
-        }
-        return $this->get( Session::TOKEN_ID );
+    function getToken( $tag=true ) {
+        return $this->getHidden( Session::TOKEN_ID );
     }
 
     /**
      * @param string $value
      * @param string $key
      */
-    function setButton($value, $key='_buttonValue')
-    {
+    function setButton($value, $key='_buttonValue') {
         $this->set( $key, $value);
     }
 
@@ -239,8 +225,7 @@ class PageView implements \ArrayAccess
      * @param string $key
      * @return string
      */
-    function getButton($key='_buttonValue')
-    {
+    function getButton($key='_buttonValue') {
         if( !$value = $this->get($key) ) return '';
         return '<input type=' . "\"submit\" value=\"{$value}\" />";
     }
@@ -248,8 +233,7 @@ class PageView implements \ArrayAccess
     /**
      * @param $type
      */
-    function setSubButton($type)
-    {
+    function setSubButton($type) {
         $this->set( '_subButtonType', $type );
     }
 
