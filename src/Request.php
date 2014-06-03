@@ -24,7 +24,7 @@ class Request
     // +----------------------------------------------------------------------+
     //  construction and data
     // +----------------------------------------------------------------------+
-    public function __construct( $request=false, $server=false )
+    public function __construct( $request=null, $server=null )
     {
         $this->setRequest( $request );
         $this->setServer(  $server );
@@ -36,7 +36,7 @@ class Request
      */
     public function setRequest( $data )
     {
-        if( $data === false ) {
+        if( !$data ) {
             $this->request = & $_REQUEST;
         } else {
             $this->request = $data;
@@ -45,17 +45,65 @@ class Request
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return $this
      */
     public function setServer( $data )
     {
-        if( $data === false ) {
+        if( !$data ) {
             $this->server = & $_SERVER;
         } else {
             $this->server = $data;
         }
         return $this;
+    }
+
+    // +----------------------------------------------------------------------+
+    //  passing data to next request
+    // +----------------------------------------------------------------------+
+    /**
+     * @param array $data
+     * @return string
+     */
+    public function pack( $data )
+    {
+        $data = serialize( $data );
+        $data = base64_encode( $data );
+        return $data;
+    }
+
+    /**
+     * @param string$data
+     * @return array
+     */
+    public function unpack( $data )
+    {
+        $data = base64_decode( $data );
+        $data = unserialize( $data );
+        return $data;
+    }
+
+    /**
+     * @param null|array $post
+     * @return string
+     */
+    public function packPost( $post=null )
+    {
+        if( !$post ) $post = $_POST;
+        $saved = $this->pack( $post );
+        return $saved;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function loadPost( $name )
+    {
+        if( !$info = $this->get( $name ) ) return false;
+        $data = $this->unpack( $info );
+        $this->request = array_merge( $this->request, $data );
+        return true;
     }
 
     // +----------------------------------------------------------------------+
