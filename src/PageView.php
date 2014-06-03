@@ -30,7 +30,7 @@ class PageView implements \ArrayAccess
     protected $contents    = array();
 
     /**
-     * data to pass to next request.
+     * list of keys to pass to next request.
      *
      * @var array
      */
@@ -278,16 +278,14 @@ class PageView implements \ArrayAccess
     /**
      * @param string $message
      */
-    function message( $message )
-    {
+    function message( $message ) {
         $this->message = $message;
     }
 
     /**
      * @param string $message
      */
-    function error( $message )
-    {
+    function error( $message ) {
         $this->error = self::ERROR;
         $this->message = $message;
     }
@@ -295,8 +293,7 @@ class PageView implements \ArrayAccess
     /**
      * @param string $message
      */
-    function critical( $message )
-    {
+    function critical( $message ) {
         $this->error = self::CRITICAL;
         $this->message = $message;
     }
@@ -304,24 +301,21 @@ class PageView implements \ArrayAccess
     /**
      * @return bool
      */
-    function isError()
-    {
+    function isError() {
         return $this->error >= self::ERROR;
     }
 
     /**
      * @return bool
      */
-    function isCritical()
-    {
+    function isCritical() {
         return $this->error >= self::CRITICAL;
     }
 
     /**
      * @return string
      */
-    function getMessage()
-    {
+    function getMessage() {
         return $this->message;
     }
 
@@ -348,16 +342,14 @@ class PageView implements \ArrayAccess
     /**
      * Whether a offset exists
      */
-    public function offsetExists( $offset )
-    {
+    public function offsetExists( $offset ) {
         return array_key_exists( $offset, $this->contents );
     }
 
     /**
      * Offset to retrieve
      */
-    public function offsetGet( $offset )
-    {
+    public function offsetGet( $offset ) {
         $value = $this->get( $offset );
         return $this->h( $value );
     }
@@ -365,16 +357,14 @@ class PageView implements \ArrayAccess
     /**
      * Offset to set
      */
-    public function offsetSet( $offset, $value )
-    {
+    public function offsetSet( $offset, $value ) {
         $this->contents[$offset] = $value;
     }
 
     /**
      * Offset to unset
      */
-    public function offsetUnset( $offset )
-    {
+    public function offsetUnset( $offset ) {
         if( $this->offsetExists($offset) ) {
             unset( $this->contents[$offset] );
         }

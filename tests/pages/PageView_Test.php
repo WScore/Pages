@@ -99,4 +99,26 @@ class PageView_Test extends \PHPUnit_Framework_TestCase
         $this->assertTrue(  $this->view->is( 'array',  2 ) );
         $this->assertTrue(  $this->view->is( 'array',  3 ) );
     }
+
+    /**
+     * @test
+     */
+    function h_applies_htmlSpecialChars()
+    {
+        $this->assertEquals( 'tested', $this->view->h( 'tested' ) );
+        $this->assertEquals( '&lt;b&gt;b&lt;/b&gt;', $this->view->h( '<b>b</b>' ) );
+    }
+
+    /**
+     * @test
+     */
+    function getOffset_returns_htmlSafe_characters()
+    {
+        $data = [ 'text' => 'tested', 'html' => '<b>b</b>' ];
+        $this->view->assign($data);
+        $this->view['text'] = 'tested';
+        $this->view['html'] = '<b>b</b>';
+        $this->assertEquals( 'tested',  $this->view['text'] );
+        $this->assertEquals( '&lt;b&gt;b&lt;/b&gt;',  $this->view['html'] );
+    }
 }
