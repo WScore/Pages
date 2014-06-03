@@ -73,6 +73,7 @@ abstract class ControllerAbstract
      */
     public function beginController( $method )
     {
+        $this->request->loadPost( '_savedPost' );
         $this->setCurrentMethod( $method );
     }
 
@@ -80,6 +81,15 @@ abstract class ControllerAbstract
      * overwrite this to finish controller after on* method.
      */
     public function finishController() {}
+
+    /**
+     * @param array $data
+     */
+    protected function savePost( $data=array() )
+    {
+        $packed = $this->request->packPost( $data );
+        $this->view->pass( '_savedPost', $packed );
+    }
 
     // +----------------------------------------------------------------------+
     //  sort of Response class. 

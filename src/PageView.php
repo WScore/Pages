@@ -29,6 +29,13 @@ class PageView implements \ArrayAccess
      */
     protected $contents    = array();
 
+    /**
+     * data to pass to next request.
+     *
+     * @var array
+     */
+    protected $toPass = array();
+
     // +----------------------------------------------------------------------+
     //  Response and locations
     //  a bit like a Response class. 
@@ -55,6 +62,16 @@ class PageView implements \ArrayAccess
     }
     /** outdated method. */
     function add( $k, $v) {$this->set($k,$v);}
+
+    /**
+     * @param $key
+     * @param $value
+     */
+    public function pass( $key, $value )
+    {
+        $this->toPass[] = $key;
+        $this->set( $key, $value );
+    }
 
     /**
      * @param $key
@@ -138,6 +155,20 @@ class PageView implements \ArrayAccess
     }
 
     /**
+     * returns hidden tags of data to pass
+     *
+     * @return string
+     */
+    function getPass()
+    {
+        $tags = '';
+        foreach( $this->toPass as $key ) {
+            $tags .= $this->getHidden( $key );
+        }
+        return $tags;
+    }
+
+    /**
      * @param $method
      */
     function setCurrentMethod( $method )
@@ -158,7 +189,7 @@ class PageView implements \ArrayAccess
      */
     function setMethod($method)
     {
-        $this->set( '_method', $method );
+        $this->pass( '_method', $method );
     }
 
     /**
@@ -172,6 +203,14 @@ class PageView implements \ArrayAccess
             $method = $this->getHidden( '_method', $tag );
         }
         return $method;
+    }
+
+    /**
+     * @param $token
+     */
+    function setToken( $token )
+    {
+        $this->pass( Session::TOKEN_ID, $token );
     }
 
     /**
