@@ -11,6 +11,57 @@ class Request
     protected $method_name = '_method';
 
     /**
+     * request data ($_REQUEST, usually). set to false if not set yet.
+     * @var array|bool
+     */
+    protected $request = false;
+
+    /**
+     * @var bool|array
+     */
+    protected $server = false;
+
+    // +----------------------------------------------------------------------+
+    //  construction and data
+    // +----------------------------------------------------------------------+
+    public function __construct( $request=false, $server=false )
+    {
+        $this->setRequest( $request );
+        $this->setServer(  $server );
+    }
+
+    /**
+     * @param array $data
+     * @return $this
+     */
+    public function setRequest( $data )
+    {
+        if( $data === false ) {
+            $this->request = & $_REQUEST;
+        } else {
+            $this->request = $data;
+        }
+        return $this;
+    }
+
+    /**
+     * @param $data
+     * @return $this
+     */
+    public function setServer( $data )
+    {
+        if( $data === false ) {
+            $this->server = & $_SERVER;
+        } else {
+            $this->server = $data;
+        }
+        return $this;
+    }
+
+    // +----------------------------------------------------------------------+
+    //  getting data from request.
+    // +----------------------------------------------------------------------+
+    /**
      * @param string $key
      * @param string $data
      * @param null|mixed $default
@@ -28,7 +79,7 @@ class Request
      */
     public function get( $key, $default=null )
     {
-        return $this->getData( $key, $_REQUEST, $default );
+        return array_key_exists( $key, $this->request ) ? $this->request[$key] : $default;
     }
 
     /**
@@ -76,6 +127,9 @@ class Request
         return null;
     }
 
+    // +----------------------------------------------------------------------+
+    //  request method
+    // +----------------------------------------------------------------------+
     /**
      * @param $name
      */
@@ -97,6 +151,9 @@ class Request
         return $this->safeCode( $method );
     }
 
+    // +----------------------------------------------------------------------+
+    //  user-agent
+    // +----------------------------------------------------------------------+
     /**
      * @param null|string $ua
      * @return bool
@@ -125,4 +182,5 @@ class Request
         }
         return false;
     }
+    // +----------------------------------------------------------------------+
 }
