@@ -133,12 +133,24 @@ class PageView implements \ArrayAccess
         if( is_array( $value ) ) {
             return in_array( $real, $value );
         }
+        if( is_array( $real ) ) {
+            return in_array( $value, $real );
+        }
         return (string) $real == (string) $value;
     }
 
     // +----------------------------------------------------------------------+
     //  managing html stuff.
     // +----------------------------------------------------------------------+
+    function h( $value ) {
+        if( is_object($value) && method_exists( $value, '__toString') ) {
+            $value = (string) $value;
+        }
+        if( is_string( $value ) ) {
+            $value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+        }
+        return $value;
+    }
     /**
      * @param string $key
      * @param string|bool $name
@@ -210,7 +222,7 @@ class PageView implements \ArrayAccess
      * @return mixed|string
      */
     function getToken( $tag=true ) {
-        return $this->getHidden( Session::TOKEN_ID );
+        return $this->getHidden( Session::TOKEN_ID, $tag );
     }
 
     /**
@@ -347,10 +359,7 @@ class PageView implements \ArrayAccess
     public function offsetGet( $offset )
     {
         $value = $this->get( $offset );
-        if( $value && is_string($value) ) {
-            $value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
-        }
-        return $value;
+        return $this->h( $value );
     }
 
     /**

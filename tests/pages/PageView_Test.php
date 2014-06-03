@@ -62,4 +62,41 @@ class PageView_Test extends \PHPUnit_Framework_TestCase
         $this->assertContains( "value=\"$value", $this->view->getHidden( $key, 'hide' ) );
         $this->assertContains( "name=\"hide",    $this->view->getHidden( $key, 'hide' ) );
     }
+
+    /**
+     * @test
+     */
+    function assign_sets_array_as_data()
+    {
+        $data = [ 'test' => 'tested', 'more' => 'done' ];
+        $this->view->assign($data);
+        $this->assertEquals( 'tested', $this->view->get('test') );
+        $this->assertEquals( 'done', $this->view->get('more') );
+    }
+
+    /**
+     * @test
+     */
+    function collection_always_return_an_array()
+    {
+        $data = [ 'single' => 'tested', 'array' => [ 'tested', 'more' ] ];
+        $this->view->assign($data);
+        $this->assertEquals( array(), $this->view->collection('none') );
+        $this->assertEquals( ['tested'], $this->view->collection('single') );
+        $this->assertEquals( [ 'tested', 'more' ], $this->view->collection('array') );
+    }
+
+    /**
+     * @test
+     */
+    function is_checks_value_against_key()
+    {
+        $data = [ 'single' => '1', 'array' => [ '2', '3' ] ];
+        $this->view->assign($data);
+        $this->assertTrue(  $this->view->is( 'single', 1 ) );
+        $this->assertFalse( $this->view->is( 'single', 2 ) );
+        $this->assertFalse( $this->view->is( 'array',  1 ) );
+        $this->assertTrue(  $this->view->is( 'array',  2 ) );
+        $this->assertTrue(  $this->view->is( 'array',  3 ) );
+    }
 }
