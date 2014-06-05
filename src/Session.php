@@ -34,13 +34,30 @@ class Session
      */
     public static function getInstance()
     {
-        if( !isset( $_SESSION ) ) {
+        if( self::isSessionStarted() ) {
             session_start();
         }
         /** @var Session $session */
         $session = new static();
         $session->setData( $_SESSION );
         return $session;
+    }
+
+    /**
+     * use new function from:
+     * http://www.php.net/manual/en/function.session-status.php
+     * 
+     * @return bool
+     */
+    public static function isSessionStarted()
+    {
+        if ( php_sapi_name() === 'cli' ) {
+            return FALSE;
+        }
+        if ( function_exists( 'session_status' ) ) { // new function (PHP >=5.4.0)
+            return session_status() === PHP_SESSION_ACTIVE ? TRUE : FALSE;
+        }
+        return session_id() === '' ? FALSE : TRUE;
     }
 
     /**
