@@ -16,4 +16,12 @@ class TestController extends ControllerAbstract
         $this->executed = true;
         return ['execute' => 'executed'];
     }
+    
+    function onArgument( $arg )
+    {
+        if( !$arg ) {
+            $this->critical( 'please specify the argument' );
+        }
+        return ['argument' => $arg ];
+    }
 }

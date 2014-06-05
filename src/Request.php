@@ -111,13 +111,11 @@ class Request
     // +----------------------------------------------------------------------+
     /**
      * @param string $key
-     * @param string $data
-     * @param null|mixed $default
-     * @return mixed
+     * @return bool
      */
-    protected function getData( $key, $data, $default=null )
+    public function exists( $key )
     {
-        return array_key_exists( $key, $data ) ? $data[$key] : $default;
+        return array_key_exists( $key, $this->request );
     }
 
     /**
@@ -127,7 +125,7 @@ class Request
      */
     public function get( $key, $default=null )
     {
-        return array_key_exists( $key, $this->request ) ? $this->request[$key] : $default;
+        return $this->exists($key) ? $this->request[$key] : $default;
     }
 
     /**

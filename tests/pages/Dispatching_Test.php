@@ -53,4 +53,34 @@ class Dispatching_Test extends \PHPUnit_Framework_TestCase
         $view = $this->d->execute();
         $this->assertEquals('executed', $view['execute']);
     }
+
+    /**
+     * @test
+     */
+    function executing_non_existence_method_returns_critical_error()
+    {
+        $view = $this->d->execute('argument');
+        $this->assertTrue($view->isCritical());
+        $this->assertEquals('please specify the argument', $view->getMessage());
+    }
+
+    /**
+     * @test
+     */
+    function onArgument_argument_is_populated()
+    {
+        $this->d->getRequest()->setRequest(['arg'=>'arg-tested']);
+        $view = $this->d->execute('argument');
+        $this->assertEquals('arg-tested', $view['argument']);
+    }
+
+    /**
+     * @test
+     */
+    function onArgument_without_argument_returns_critical_error()
+    {
+        $view = $this->d->execute('argument');
+        $this->assertTrue($view->isCritical());
+        $this->assertEquals('please specify the argument', $view->getMessage());
+    }
 }
