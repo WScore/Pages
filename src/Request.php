@@ -192,7 +192,8 @@ class Request
      */
     public function getMethod( $name=null )
     {
-        $http_method = $_SERVER['REQUEST_METHOD'];
+        
+        $http_method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD']: 'get';
         if( !$name ) $name = $this->method_name;
         $method = $this->get( $name, $http_method );
         $method = strtolower( $method );

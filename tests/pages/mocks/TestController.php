@@ -14,5 +14,6 @@ class TestController extends ControllerAbstract
     function onExecute()
     {
         $this->executed = true;
+        return ['execute' => 'executed'];
     }
 }
