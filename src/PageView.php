@@ -34,7 +34,9 @@ class PageView implements \ArrayAccess
      *
      * @var array
      */
-    protected $toPass = array();
+    protected $toPass = array(
+        '_token', '_method', '_savedPost',
+    );
 
     // +----------------------------------------------------------------------+
     //  Response and locations
