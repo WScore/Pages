@@ -37,7 +37,7 @@ class Request
     public function setRequest( $data )
     {
         if( !$data ) {
-            $this->request = & $_REQUEST;
+            $this->request = $_REQUEST;
         } else {
             $this->request = $data;
         }
