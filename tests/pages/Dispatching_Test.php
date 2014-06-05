@@ -59,9 +59,9 @@ class Dispatching_Test extends \PHPUnit_Framework_TestCase
      */
     function executing_non_existence_method_returns_critical_error()
     {
-        $view = $this->d->execute('argument');
+        $view = $this->d->execute('noSuch');
         $this->assertTrue($view->isCritical());
-        $this->assertEquals('please specify the argument', $view->getMessage());
+        $this->assertEquals('no method: noSuch', $view->getMessage());
     }
 
     /**
