@@ -98,8 +98,9 @@ class PageView implements \ArrayAccess
      * @param null|mixed $default
      * @return mixed
      */
-    function get( $key, $default=null )
+    function get( $key=null, $default=null )
     {
+        if( !$key ) return $this->contents;
         if( $this->exists($key) ) {
             return $this->contents[$key];
         }

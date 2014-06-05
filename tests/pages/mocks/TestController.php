@@ -24,4 +24,13 @@ class TestController extends ControllerAbstract
         }
         return ['argument' => $arg ];
     }
+    
+    function onSavePost()
+    {
+        $posts = array();
+        $posts['post1'] = $this->request->get( 'post1' );
+        $posts['post2'] = $this->request->get( 'post2' );
+        $this->savePost($posts);
+        $this->set( 'posted', implode(':', $posts) );
+    }
 }

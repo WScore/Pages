@@ -22,6 +22,11 @@ class Dispatching_Test extends \PHPUnit_Framework_TestCase
     
     function setup()
     {
+        $this->buildDispatcher();
+    }
+    
+    function buildDispatcher()
+    {
         $this->c = new TestController();
         $this->d = Factory::getDispatch( $this->c );
     }
@@ -35,6 +40,9 @@ class Dispatching_Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals('WScore\Pages\PageView', get_class($this->d->getView()));
     }
 
+    // +----------------------------------------------------------------------+
+    //  test correct method is executed. 
+    // +----------------------------------------------------------------------+
     /**
      * @test
      */
@@ -57,6 +65,17 @@ class Dispatching_Test extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    function dispatches_onExecute_by_specifying_method_variable_name()
+    {
+        $this->d->getRequest()->setMethodName('action');
+        $this->d->getRequest()->setRequest(['action'=>'execute']);
+        $view = $this->d->execute();
+        $this->assertEquals('executed', $view['execute']);
+    }
+
+    /**
+     * @test
+     */
     function executing_non_existence_method_returns_critical_error()
     {
         $view = $this->d->execute('noSuch');
@@ -64,6 +83,9 @@ class Dispatching_Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals('no method: noSuch', $view->getMessage());
     }
 
+    // +----------------------------------------------------------------------+
+    //  test argument is passed to the execute method.
+    // +----------------------------------------------------------------------+
     /**
      * @test
      */
@@ -83,4 +105,37 @@ class Dispatching_Test extends \PHPUnit_Framework_TestCase
         $this->assertTrue($view->isCritical());
         $this->assertEquals('please specify the argument', $view->getMessage());
     }
+    // +----------------------------------------------------------------------+
+    // +----------------------------------------------------------------------+
+    /**
+     * @test
+     */
+    function savePost_sets_compact_data_to_view_and_loadPost_to_use_the_data()
+    {
+        $this->d->getRequest()->setRequest(['post1'=>'tested', 'post2'=>'more']);
+        $view = $this->d->execute('savePost');
+        $this->assertTrue(isset( $view['_savedPost']));
+        $this->assertEquals('tested:more', $view['posted']);
+        
+        // check on what is saved. 
+        $saved = $view->get();
+        $saved = $this->d->getRequest()->unpack($saved['_savedPost']);
+        $this->assertTrue( is_array($saved));
+        $this->assertEquals( 'tested', $saved['post1']);
+        $this->assertEquals( 'more', $saved['post2']);
+        
+        // let's call it again. this should create no posted...
+        $this->buildDispatcher();
+        $view = $this->d->execute('savePost');
+        $this->assertTrue(isset( $view['_savedPost']));
+        $this->assertEquals(':', $view['posted']);
+
+        // let's call it again with the savedPost. 
+        $this->buildDispatcher();
+        $this->d->getRequest()->setRequest($saved);
+        $view = $this->d->execute('savePost');
+        $this->assertTrue(isset( $view['_savedPost']));
+        $this->assertEquals('tested:more', $view['posted']);
+    }
+    // +----------------------------------------------------------------------+
 }
