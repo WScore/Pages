@@ -8,7 +8,7 @@ use WScore\Pages\Factory;
 require_once( dirname(__DIR__).'/autoload.php' );
 require_once( __DIR__ . '/mocks/TestController.php' );
 
-class Dispatching_Test extends \PHPUnit_Framework_TestCase
+class Dispatch_FunctionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var TestController
@@ -27,6 +27,7 @@ class Dispatching_Test extends \PHPUnit_Framework_TestCase
     
     function buildDispatcher()
     {
+        $_REQUEST = array();
         $this->c = new TestController();
         $this->d = Factory::getDispatch( $this->c );
     }
