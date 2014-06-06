@@ -1,10 +1,12 @@
 WScore.Pages
 ============
 
-Page controller for legacy and simple php. 
+A simple page controller for legacy php code.
 
-This project aims to ease the legacy php life (i.e. me)
-with handful of useful tools that are small and fast.
+This package provides a plain, simple, and easy to use
+page controller (i.e. dispatcher) for good old legacy
+php code, with a high hope to reduce the pain of
+maintaining the old old php code.
 
 ### License
 
