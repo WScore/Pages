@@ -5,8 +5,8 @@ A simple page controller package for legacy php code.
 
 This package provides a plain, simple, and easy to use
 page controller (i.e. dispatcher) for good old legacy
-php code, with a high hope to ease maintaining the
-old and painful php code. Yap, this is for me.
+php code, with a high hope to ease the maintenance of
+old and painful php code. Yap, this is for myself.
 
 ### License
 
@@ -29,12 +29,29 @@ Quick Overview
 Quite ordinary setups.
 
 1.   Prepare ```Controller``` class, and construct it.
-2.   Execute methods using ```Dispatch``.
-3.   The result is ```View``` object used for HTML.
+2.   Construct the ```Dispatcher```, the application.
+3.   Execute the dispatcher. and get the result ```View``` object.
+4.   Use the ```View``` object to generate HTML.
 
+A sample dispatcher code.
 
-Sample Code
------------
+```php
+$app = \WScore\Pages\Factory::getDispatch(
+    new MyController( new MyDao() )
+);
+$view = $app->execute();
+```
+
+The dispatcher executes the controller's method
+ based on http method name, such as onGet, onPost.
+ To overwrite the http method, use ```_method``` value.
+
+You can specify the method to execute, as well.
+
+```php
+$view = $app->execute( 'index' ); // executes onIndex.
+```
+
 
 ### a simple Controller class
 
@@ -58,13 +75,8 @@ class MyController extends ControllerAbstract {
 }
 ```
 
-The ```onHttpMethodName``` methods are executed based on
-http method. For instance, ```onGet``` method is executed
-if the http method is 'get'.
- to overwrite the http method, use ```_method``` value.
-
 The arguments in the on-methods are populated with values
- taken from $_REQUEST. null is set if value is not found.
+ in the $_REQUEST. ```null``` is set if value is not found.
 
 To set value in the view, use ```set``` method. Or, return
  an array from the on-method.
@@ -72,28 +84,13 @@ To set value in the view, use ```set``` method. Or, return
 Also, using ```pass``` method, the value will be passed
 to the next request via hidden tags.
 
-### Dispatch
 
-Use factory class.
-
-```php
-$app = \WScore\Pages\Factory::getDispatch(
-    new MyController( new MyDao() )
-);
-$view = $app->execute();
-```
-
-You can specify the method to execute.
-
-```php
-$view = $app->execute( 'index' ); // executes onIndex.
-```
 
 ### View and HTML
 
 The ```$view``` object keeps the value set in the
-controller. The values can be accessed as an array;
-and the values are htmlspecialchars-ized.
+ controller. The values can be accessed as an array;
+ and the values are htmlspecialchars-ized.
 
 ```php
 echo $view['title'];        // shows 'Got A Data'
@@ -108,7 +105,7 @@ FYI, ```is``` method is also available.
 
 ```php
 $view->is( '_current_method', 'get' );  // check the current method.
-$view->is( '_method', 'get' );          // check the next method.
+$view->is( '_method', ['put','post'] ); // check the next method.
 ```
 
 
@@ -159,8 +156,8 @@ Use ```alert``` method to display the messages.
 ### C.S.R.F. Token
 
 Generates token for Cross Site Resource Forgeries (CSRF).
-This is a sample code to be used in the beginController
-method.
+ This is a sample code to be used in the beginController
+ method.
 
 ```php
 class MyController extends ControllerAbstract
@@ -182,15 +179,15 @@ $view->getPass(); // トークンも一緒に出力される。
 ```
 
 Ah, well, the beginController method is a method
-that is called always before the execution.
+ that is called always before the execution.
 
 
 ### flash messages
 
 Use ```flash{Message|Error}``` to set flash messages
-in the session data, and use ```setFlashMessage()```
-method to retrieve the message in the next page.
-The flash message is thrown out if not used.
+ in the session data, and use ```setFlashMessage()```
+ method to retrieve the message in the next page.
+ The flash message is thrown out if not used.
 
 ```php
 class MyController extends ControllerAbstract
@@ -213,25 +210,24 @@ echo $view->alert(); // shows the flash message.
 ### automatic view setup based on HTTP method
 
 A lot of HTML values, such as title, breadcrumbs,
-and button names, can be determined based on the
-http method. So, there is a feature to do that
-automatically.
+ and button names, can be determined based on the
+ http method. So, there is a feature to do that
+ automatically.
 
 ```php
 class MyController extends ControllerAbstract
     protected $currentView = array(
-        // get data view
-        'modForm'    => [
-            '_method'        => 'put',
-            '_buttonValue'   => 'modify data',
-            '_subButtonType' => 'reset',
-            'curr_title'     => 'Modification Form',
+        'modForm' => [
+            'curr_title'              => 'Modification Form',
+            '_method'                 => 'put',
+            PageView::BUTTON_VALUE    => 'modify data',
+            PageView::SUB_BUTTON_TYPE => 'reset',
         ],
-        'put'     => [
-            '_method'        => 'index',
-            '_buttonValue'   => 'list data',
-            '_subButtonType' => 'none',
-            'curr_title'     => 'update complete',
+        'put' => [
+            'curr_title'              => 'update complete',
+            '_method'                 => 'index',
+            PageView::BUTTON_VALUE    => 'list data',
+            PageView::SUB_BUTTON_TYPE => 'none',
         ],
     );
     public function beginController( $method ) {
@@ -241,6 +237,6 @@ class MyController extends ControllerAbstract
 ```
 
 The automation takes place in the beginController
-method using setCurrentMethod method. Please write
-your own code if beginController is overloaded.
+ method using setCurrentMethod method. Please write
+ your own code if beginController is overloaded.
 
