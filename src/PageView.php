@@ -11,6 +11,10 @@ class PageView implements \ArrayAccess
     const ERROR    = '400';
     const CRITICAL = '500';
 
+    const CURRENT_METHOD = '_current_method';
+    const BUTTON_VALUE = '_buttonValue';
+    const SUB_BUTTON_TYPE = '_subButtonType';
+
     /**
      * for messages. 
      * 
@@ -35,7 +39,7 @@ class PageView implements \ArrayAccess
      * @var array
      */
     protected $toPass = array(
-        '_token', '_method', '_savedPost',
+        Session::TOKEN_ID, Request::METHOD_KEY, ControllerAbstract::SAVE_POST_ID,
     );
 
     // +----------------------------------------------------------------------+
@@ -188,21 +192,21 @@ class PageView implements \ArrayAccess
      * @param $method
      */
     function setCurrentMethod( $method ) {
-        $this->set( '_current_method', $method );
+        $this->set( self::CURRENT_METHOD, $method );
     }
 
     /**
      * @return string|null
      */
     function getCurrentMethod() {
-        return $this->get( '_current_method' );
+        return $this->get( self::CURRENT_METHOD );
     }
 
     /**
      * @param $method
      */
     function setMethod($method) {
-        $this->pass( '_method', $method );
+        $this->pass( Request::METHOD_KEY, $method );
     }
 
     /**
@@ -210,7 +214,7 @@ class PageView implements \ArrayAccess
      * @return string
      */
     function getMethod( $tag=true ) {
-        return $this->getHidden( '_method', $tag );
+        return $this->getHidden( Request::METHOD_KEY, $tag );
     }
 
     /**
@@ -232,7 +236,7 @@ class PageView implements \ArrayAccess
      * @param string $value
      * @param string $key
      */
-    function setButton($value, $key='_buttonValue') {
+    function setButton($value, $key=self::BUTTON_VALUE) {
         $this->set( $key, $value);
     }
 
@@ -240,16 +244,17 @@ class PageView implements \ArrayAccess
      * @param string $key
      * @return string
      */
-    function getButton($key='_buttonValue') {
+    function getButton($key=self::BUTTON_VALUE) {
         if( !$value = $this->get($key) ) return '';
         return '<input type=' . "\"submit\" value=\"{$value}\" />";
     }
 
     /**
-     * @param $type
+     * @param string $type
+     * @param string $key
      */
-    function setSubButton($type) {
-        $this->set( '_subButtonType', $type );
+    function setSubButton($type, $key=self::SUB_BUTTON_TYPE) {
+        $this->set( $key, $type );
     }
 
     /**
@@ -258,9 +263,9 @@ class PageView implements \ArrayAccess
      */
     function getSubButton($key=null)
     {
-        if( !$key ) $key = '_subButtonType';
+        if( !$key ) $key = self::SUB_BUTTON_TYPE;
         $html = '';
-        $type = $this->get($key);
+        if( !$type = $this->get($key) ) return $html;
         switch( $type ) {
             case 'reset':
                 $html = '<input type="reset" value="リセット" />';

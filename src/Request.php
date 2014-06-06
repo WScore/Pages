@@ -3,12 +3,14 @@ namespace WScore\Pages;
 
 class Request
 {
+    const METHOD_KEY = '_method';
+
     /**
      * key name for overwriting http method.
      *
      * @var string
      */
-    protected $method_name = '_method';
+    protected $method_name = self::METHOD_KEY;
 
     /**
      * request data ($_REQUEST, usually). set to false if not set yet.

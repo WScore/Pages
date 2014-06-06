@@ -3,6 +3,7 @@ namespace WScore\Pages;
 
 abstract class ControllerAbstract
 {
+    const SAVE_POST_ID = '_savedPost';
     /**
      * @var PageView
      */
@@ -73,7 +74,7 @@ abstract class ControllerAbstract
      */
     public function beginController( $method )
     {
-        $this->request->loadPost( '_savedPost' );
+        $this->request->loadPost( ControllerAbstract::SAVE_POST_ID );
         $this->setCurrentMethod( $method );
     }
 
@@ -88,7 +89,7 @@ abstract class ControllerAbstract
     protected function savePost( $data=array() )
     {
         $packed = $this->request->packPost( $data );
-        $this->view->pass( '_savedPost', $packed );
+        $this->view->pass( ControllerAbstract::SAVE_POST_ID, $packed );
     }
 
     // +----------------------------------------------------------------------+
