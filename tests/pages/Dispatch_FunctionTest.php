@@ -138,5 +138,15 @@ class Dispatch_FunctionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset( $view['_savedPost']));
         $this->assertEquals('tested:more', $view['posted']);
     }
+
+    /**
+     * @test
+     */
+    function currView_sets_views_automatically()
+    {
+        $view = $this->d->execute('currView');
+        $this->assertEquals('nextView', $view['_method']);
+        $this->assertEquals('view is tested', $view['test']);
+    }
     // +----------------------------------------------------------------------+
 }

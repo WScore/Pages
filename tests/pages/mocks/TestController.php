@@ -10,6 +10,13 @@ class TestController extends ControllerAbstract
      * @var bool
      */
     public $executed = false;
+
+    protected $currentView = [
+        'currView' => [
+            '_method' => 'nextView',
+            'test' => 'view is tested',
+        ]
+    ];
     
     function onExecute()
     {
@@ -32,5 +39,10 @@ class TestController extends ControllerAbstract
         $posts['post2'] = $this->request->get( 'post2' );
         $this->savePost($posts);
         $this->set( 'posted', implode(':', $posts) );
+    }
+
+    function onCurrView()
+    {
+        // do nothing.
     }
 }
