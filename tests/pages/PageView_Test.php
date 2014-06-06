@@ -121,4 +121,24 @@ class PageView_Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals( 'tested',  $this->view['text'] );
         $this->assertEquals( '&lt;b&gt;b&lt;/b&gt;',  $this->view['html'] );
     }
+
+    /**
+     * @test
+     */
+    function toPass_is_preset()
+    {
+        $data = [
+            '_method' => 'testing',
+            '_token' => 'tested',
+            '_savedPost' => 'saved data',
+            'test' => 'normal',
+        ];
+        $this->view->assign( $data );
+        $passed = $this->view->getPass();
+        $this->assertContains( '<input type="hidden" ', $passed );
+        $this->assertContains( 'name="_method"', $passed );
+        $this->assertContains( 'name="_token"', $passed );
+        $this->assertContains( 'name="_savedPost"', $passed );
+        $this->assertNotContains( 'name="test"', $passed );
+    }
 }
