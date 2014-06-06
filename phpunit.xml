@@ -11,7 +11,7 @@
          syntaxCheck="false"
         >
     <testsuites>
-        <testsuite name="Application Test Suite">
+        <testsuite name="WScore/Pages Test Suite">
             <directory>./tests/pages/</directory>
         </testsuite>
     </testsuites>
