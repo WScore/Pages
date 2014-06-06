@@ -121,11 +121,9 @@ class MyController extends ControllerAbstract {
             $this->critical( 'no id!' ); // throws an exception.
         }
         if( !$data = $this->dao->find($id) ) {
-            $this->error( 'no such id: '.$id );
+            $this->error( 'no such id: '.$id ); // set error message.
         } else {
-            $this->pass( 'id,' $id );
-            $this->set(  'data', $data );
-            $this->message( 'found a data!' );
+            $this->message( 'found a data!' );  // show this message.
         }
         return [ 'title' => 'Got A Data!' ];
     }
@@ -141,7 +139,7 @@ if( $view->isCritical() ) {
 } elseif( $view->isError() ) {
     // do something?
 } else {
-    // do show some data
+    // do show some data?
 }
 ```
 
@@ -180,9 +178,9 @@ $view->getPass(); // トークンも一緒に出力される。
 
 ### フラッシュ・メッセージ
 
-フラッシュメッセージは```flash{Message|Error}```で設定し、
-次の画面で```setFlashMessage()```で読み込みます。
-読まなければ、メッセージは破棄されます。
+フラッシュメッセージは```flash{Message|Error}```で
+セッションに設定し、次の画面で```setFlashMessage()```で
+読み込みます。読まなければ、メッセージは破棄されます。
 
 ```php
 class MyController extends ControllerAbstract
@@ -201,3 +199,39 @@ class MyController extends ControllerAbstract
 /// in html
 echo $view->alert(); // shows the flash message.
 ```
+
+### HTTPメソッドでの自動設定
+
+HTMLで表示するタイトル、パンくず名、ボタンの名称、などなど
+メソッドが決まれば（ほぼ）一意に決まる設定が多くあります。
+設定を簡単にするため、HTTPメソッドを元にビューオブジェクト
+に自動で値を設定する機能があります。
+
+```php
+class MyController extends ControllerAbstract
+    protected $currentView = array(
+        // get data view
+        'modForm'    => [
+            '_method'        => 'put',
+            '_buttonValue'   => 'modify data',
+            '_subButtonType' => 'reset',
+            'curr_title'     => 'Modification Form',
+        ],
+        'put'     => [
+            '_method'        => 'index',
+            '_buttonValue'   => 'list data',
+            '_subButtonType' => 'none',
+            'curr_title'     => 'update complete',
+        ],
+    );
+    public function beginController( $method ) {
+        $this->setCurrentMethod( $method );
+    }
+}
+```
+
+自動設定は、setCurrentMethodを使います。
+beginController内で実行していますので、オーバーロードする
+場合は、親クラスのbeginControllerを実行するか、自分で
+setCurrentMethodを実行してください。
+
