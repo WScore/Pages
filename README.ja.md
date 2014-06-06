@@ -45,8 +45,8 @@ class MyController extends ControllerAbstract {
     }
     public function onGet($id) {
         $data = $this->dao->find($id)
-        $this->pass( $id );
-        $this->set( $data );
+        $this->pass( 'id', $id );
+        $this->set(  'data', $data );
         return [ 'title' => 'Got A Data!' ];
     }
 }
@@ -123,8 +123,8 @@ class MyController extends ControllerAbstract {
         if( !$data = $this->dao->find($id) ) {
             $this->error( 'no such id: '.$id );
         } else {
-            $this->pass( $id );
-            $this->set( $data );
+            $this->pass( 'id,' $id );
+            $this->set(  'data', $data );
             $this->message( 'found a data!' );
         }
         return [ 'title' => 'Got A Data!' ];
@@ -174,6 +174,9 @@ class MyController extends ControllerAbstract
 $view->getPass(); // トークンも一緒に出力される。
 ```
 
+えぇと、beginControllerメソッドは、とにかく最初に必ず
+呼ばれるメソッドです。
+
 
 ### フラッシュ・メッセージ
 
@@ -189,7 +192,7 @@ class MyController extends ControllerAbstract
         } else {
             $this->flashError( 'Ooops, not updated!!!' );
         }
-        $this->location( '.../ ); // to onGet.
+        $this->location( '.../' ); // to onGet.
     }
     public function onGet($id) {
         $this->setFlashMessage();
