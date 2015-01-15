@@ -34,7 +34,7 @@ class Session
      */
     public static function getInstance()
     {
-        if( self::isSessionStarted() ) {
+        if( !self::isSessionStarted() ) {
             session_start();
         }
         /** @var Session $session */
