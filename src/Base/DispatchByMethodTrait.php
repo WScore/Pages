@@ -4,10 +4,21 @@ namespace WScore\Pages\Base;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tuum\Respond\RequestHelper;
+use Tuum\Respond\Responder\View;
 
 trait DispatchByMethodTrait
 {
-    use ControllerTrait;
+    /**
+     * @param string $method
+     * @param array  $params
+     * @return null|ResponseInterface
+     */
+    abstract protected function dispatchMethod($method, $params);
+
+    /**
+     * @return View
+     */
+    abstract protected function view();
 
     /**
      * @param ServerRequestInterface $request

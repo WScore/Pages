@@ -4,15 +4,36 @@ namespace WScore\Pages\Base;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tuum\Respond\RequestHelper;
+use Tuum\Respond\Responder\View;
 
 trait DispatchByRoute
 {
-    use ControllerTrait;
-
     /**
      * @return array
      */
     abstract protected function getRoutes();
+
+    /**
+     * @return string
+     */
+    abstract protected function getPathInfo();
+
+    /**
+     * @return View
+     */
+    abstract protected function view();
+
+    /**
+     * @return ServerRequestInterface
+     */
+    abstract protected function getRequest();
+
+    /**
+     * @param string $dispatch
+     * @param array  $params
+     * @return ResponseInterface
+     */
+    abstract protected function dispatchMethod($dispatch, $params);
 
     /**
      * @param array  $routes
