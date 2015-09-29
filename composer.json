@@ -10,7 +10,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
-
+        "tuum/respond":"1.x@dev"
     },
     "autoload": {
         "psr-4" : {
