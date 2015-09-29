@@ -11,7 +11,7 @@ abstract class AbstractController
 {
     use ControllerTrait;
 
-    protected $csrf_name = '_method';
+    protected $csrf_name = '_token';
 
     /**
      * @param ServerRequestInterface $request
@@ -33,8 +33,7 @@ abstract class AbstractController
      */
     protected function csRfGuard()
     {
-        $token   = array_key_exists($this->csrf_name, $this->request->getParsedBody()) ?
-            $this->request->getParsedBody()[$this->csrf_name]:null;
+        $token   = $this->getPost($this->csrf_name);
         $session = RequestHelper::getSessionMgr($this->request);
         return $session->validateToken($token);
     }
