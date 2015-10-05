@@ -9,7 +9,6 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         stderr="true"
         >
     <testsuites>
         <testsuite name="WScore/Pages Test Suite">
