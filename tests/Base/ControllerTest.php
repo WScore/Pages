@@ -6,7 +6,7 @@ use Psr\Http\Message\StreamInterface;
 use tests\Base\ctrl\TestController;
 use Tuum\Respond\Service\ViewStream;
 use Tuum\View\Renderer;
-use WScore\Pages\RequestBuilder;
+use WScore\Pages\Legacy\RequestBuilder;
 
 require_once(dirname(__DIR__).'/autoload.php');
 
@@ -30,7 +30,9 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
     function test_simple_controller_returns_all_view_properties()
     {
         $controller = new TestController();
-        $request    = RequestBuilder::forge(null)->build([]);
+        $request    = RequestBuilder::forgeFromPath('test')
+            ->withTuum(RequestBuilder::buildResponder('none'))
+            ->getRequest();
         $response   = $controller->invoke($request);
         $body       = $response->getBody();
         $this->assertTrue($response instanceof ResponseInterface);
