@@ -3,7 +3,7 @@ namespace tests\Base\ctrl;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use WScore\Pages\AbstractController;
+use WScore\Pages\Legacy\AbstractController;
 
 class TestController extends AbstractController
 {

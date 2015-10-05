@@ -1,5 +1,5 @@
 <?php
-namespace WScore\Pages;
+namespace WScore\Pages\Legacy;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
