@@ -31,7 +31,7 @@ class PageController extends AbstractController
     public function onGet($name = null)
     {
         return $this->view()
-            ->with('name', $name ?: '** not set **')
+            ->with('name', $name)
             ->asView('top');
     }
 
@@ -41,9 +41,13 @@ class PageController extends AbstractController
      */
     public function onView($view = null)
     {
-        return $this->view()
-            ->with('view', $view)
-            ->asView('view');
+        return $this
+            ->with(function (\Tuum\Respond\Service\ViewData $data) use ($view) {
+                $data->setData('view', $view);
+
+                return $data;
+            })
+            ->view()->asView('view');
     }
 
     /**

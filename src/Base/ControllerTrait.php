@@ -5,6 +5,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tuum\Respond\RequestHelper;
 use Tuum\Respond\Respond;
+use Tuum\Respond\Responder;
 use Tuum\Respond\Responder\Error;
 use Tuum\Respond\Responder\Redirect;
 use Tuum\Respond\Responder\View;
@@ -100,6 +101,16 @@ trait ControllerTrait
         return RequestHelper::getSession($this->request, $name, $alt);
     }
 
+    /**
+     * @param callable $closure
+     * @return $this
+     */
+    protected function with($closure)
+    {
+        $this->request = Respond::with($this->request, $closure);
+        return $this;
+    }
+    
     /**
      * @return View
      */

@@ -10,7 +10,7 @@ use Tuum\Form\DataView;
 <body>
 <h1>Top Page</h1>
 
-<p>name: <?= $view->data->get('name');?></p>
+<p>name: <?= $view->data->get('name', '** not set **');?></p>
 
 <h2>post method</h2>
 <form name="post" method="post" action="" >
