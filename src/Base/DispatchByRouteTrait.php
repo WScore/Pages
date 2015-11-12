@@ -3,7 +3,7 @@ namespace WScore\Pages\Base;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tuum\Respond\RequestHelper;
+use Tuum\Respond\Helper\ReqAttr;
 use Tuum\Respond\Responder\View;
 
 trait DispatchByRoute
@@ -49,7 +49,7 @@ trait DispatchByRoute
      */
     protected function dispatch(ServerRequestInterface $request)
     {
-        $method = RequestHelper::getMethod($request);
+        $method = ReqAttr::getMethod($request);
         $path   = $this->getPathInfo();
         if (strtoupper($method) === 'OPTIONS') {
             return $this->onOptions($path);

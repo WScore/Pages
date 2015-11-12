@@ -3,9 +3,10 @@ namespace WScore\Pages\Legacy;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tuum\Respond\RequestHelper;
-use Tuum\Respond\ResponseHelper;
+use Tuum\Respond\Helper\Referrer;
+use Tuum\Respond\Respond;
 use WScore\Pages\Base\ControllerTrait;
+use Zend\Diactoros\Response;
 
 abstract class AbstractController
 {
@@ -19,12 +20,15 @@ abstract class AbstractController
      */
     public function invoke(ServerRequestInterface $request)
     {
-        $request  = RequestHelper::loadReferrer($request);
-        $response = ResponseHelper::createResponse('');
+        $referrer = new Referrer($request);
+        $referrer->load();
+
+        // go invoke this controller!
+        $response = new Response();
         $response = $this->invokeController($request, $response);
-        if ($response && $response->getStatusCode() == 200) {
-            RequestHelper::saveReferrer($request);
-        }
+        // done controller.
+
+        $referrer->save($response);
         return $response;
     }
 
@@ -34,7 +38,7 @@ abstract class AbstractController
     protected function csRfGuard()
     {
         $token   = $this->getPost($this->csrf_name);
-        $session = RequestHelper::getSessionMgr($this->request);
+        $session = Respond::session($this->request);
         return $session->validateToken($token);
     }
 
@@ -43,7 +47,7 @@ abstract class AbstractController
      */
     protected function csRfToken()
     {
-        $session = RequestHelper::getSessionMgr($this->request);
+        $session = Respond::session($this->request);
         return $session->getToken();
     }
 }

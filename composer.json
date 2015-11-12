@@ -10,7 +10,9 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "tuum/respond":"1.x@dev"
+        "tuum/respond":"1.x@dev",
+        "tuum/view":"1.x@dev",
+        "zendframework/zend-diactoros":"^1.0"
     },
     "autoload": {
         "psr-4" : {

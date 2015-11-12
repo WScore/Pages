@@ -14,9 +14,9 @@ class TestController extends AbstractController
     protected function dispatch(ServerRequestInterface $request)
     {
         return $this->view()
-            ->withMessage('dispatched')
-            ->withAlertMsg('noticed')
-            ->withErrorMsg('withoutError')
+            ->withSuccess('dispatched')
+            ->withAlert('noticed')
+            ->withError('withoutError')
             ->withInputData(['input'=>'tested'])
             ->withInputErrors(['has'=>'error'])
             ->asView('responded');

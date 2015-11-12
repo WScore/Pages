@@ -4,8 +4,6 @@ namespace tests\Base;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use tests\Base\ctrl\TestController;
-use Tuum\Respond\Service\ViewStream;
-use Tuum\View\Renderer;
 use WScore\Pages\Legacy\RequestBuilder;
 
 require_once(dirname(__DIR__).'/autoload.php');
@@ -31,16 +29,13 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
     {
         $controller = new TestController();
         $request    = RequestBuilder::forgeFromPath('test')
-            ->withTuum(RequestBuilder::buildResponder('none'))
+            ->withResponder(__DIR__)
             ->getRequest();
         $response   = $controller->invoke($request);
         $body       = $response->getBody();
         $this->assertTrue($response instanceof ResponseInterface);
         $this->assertTrue($body instanceof StreamInterface);
         $this->assertEquals('Zend\Diactoros\Response', get_class($response));
-        $this->assertEquals(ViewStream::class, get_class($body));
-        /** @var ViewStream $body */
-        $x = $body->modRenderer(function($x) {return $x;});
-        $this->assertEquals(Renderer::class, get_class($x));
+        $this->assertEquals('Zend\Diactoros\Stream', get_class($body));
     }
 }

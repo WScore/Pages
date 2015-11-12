@@ -3,7 +3,7 @@ namespace WScore\Pages\Base;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tuum\Respond\RequestHelper;
+use Tuum\Respond\Helper\ReqAttr;
 use Tuum\Respond\Respond;
 use Tuum\Respond\Responder;
 use Tuum\Respond\Responder\Error;
@@ -59,7 +59,7 @@ trait ControllerTrait
      */
     protected function getPathInfo()
     {
-        return RequestHelper::getPathInfo($this->request);
+        return ReqAttr::getPathInfo($this->request);
     }
 
     /**
@@ -86,7 +86,7 @@ trait ControllerTrait
      */
     protected function getFlash($name, $alt = null)
     {
-        return RequestHelper::getFlash($this->request, $name, $alt);
+        return Respond::session($this->request)->getFlash($name, $alt);
     }
 
     /**
@@ -98,7 +98,7 @@ trait ControllerTrait
      */
     protected function getSession($name, $alt = null)
     {
-        return RequestHelper::getSession($this->request, $name, $alt);
+        return Respond::session($this->request)->get($name, $alt);
     }
 
     /**
@@ -107,7 +107,7 @@ trait ControllerTrait
      */
     protected function with($closure)
     {
-        $this->request = Respond::with($this->request, $closure);
+        $this->request = Respond::withViewData($this->request, $closure);
         return $this;
     }
     

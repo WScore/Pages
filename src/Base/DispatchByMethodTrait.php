@@ -3,7 +3,7 @@ namespace WScore\Pages\Base;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Tuum\Respond\RequestHelper;
+use Tuum\Respond\Helper\ReqAttr;
 use Tuum\Respond\Responder\View;
 
 trait DispatchByMethodTrait
@@ -30,7 +30,7 @@ trait DispatchByMethodTrait
          * set up request information
          */
         $params = $request->getQueryParams();
-        $method = RequestHelper::getMethod($request);
+        $method = ReqAttr::getMethod($request);
         if (strtoupper($method) === 'OPTIONS') {
             return $this->onOptions();
         }
