@@ -28,7 +28,9 @@ abstract class AbstractController
         $response = $this->invokeController($request, $response);
         // done controller.
 
-        $referrer->save($response);
+        if ($response) {
+            $referrer->save($response);
+        }
         return $response;
     }
 

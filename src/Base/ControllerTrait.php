@@ -9,6 +9,7 @@ use Tuum\Respond\Responder;
 use Tuum\Respond\Responder\Error;
 use Tuum\Respond\Responder\Redirect;
 use Tuum\Respond\Responder\View;
+use Tuum\Respond\Service\SessionStorageInterface;
 
 trait ControllerTrait
 {
@@ -78,27 +79,13 @@ trait ControllerTrait
     }
 
     /**
-     * get value from flashed data in session.
-     *
-     * @param string $name
-     * @param null   $alt
-     * @return mixed
-     */
-    protected function getFlash($name, $alt = null)
-    {
-        return Respond::session($this->request)->getFlash($name, $alt);
-    }
-
-    /**
      * get value from session.
      *
-     * @param string $name
-     * @param null   $alt
-     * @return mixed
+     * @return SessionStorageInterface
      */
-    protected function getSession($name, $alt = null)
+    protected function session()
     {
-        return Respond::session($this->request)->get($name, $alt);
+        return Respond::session($this->request);
     }
 
     /**

@@ -58,7 +58,7 @@ trait DispatchByMethodTrait
         $options = array_unique($options);
         sort($options);
         $list = implode(',', $options);
-        $this->view()->asResponse('', 200, ['Allow' => $list]);
+        return $this->view()->asResponse('', 200, ['Allow' => $list]);
     }
 
 }

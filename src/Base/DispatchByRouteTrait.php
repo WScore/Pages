@@ -6,7 +6,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Tuum\Respond\Helper\ReqAttr;
 use Tuum\Respond\Responder\View;
 
-trait DispatchByRoute
+trait DispatchByRouteTrait
 {
     /**
      * @return array
@@ -34,14 +34,6 @@ trait DispatchByRoute
      * @return ResponseInterface
      */
     abstract protected function dispatchMethod($dispatch, $params);
-
-    /**
-     * @param array  $routes
-     * @param string $path
-     * @param string $method
-     * @return []
-     */
-    abstract function matchRoute(array $routes, $path, $method);
 
     /**
      * @param ServerRequestInterface $request
