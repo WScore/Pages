@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c3a1785d676fbb23e262c3332d5d995d",
-    "content-hash": "e6402dbc1546eb0f184bdc3936670ac6",
+    "hash": "1e4b83b88909db44548d3fd27b64a5c8",
+    "content-hash": "9763d4d687c6c4fec2459f8ce35a70bd",
     "packages": [
         {
             "name": "aura/session",
-            "version": "2.x-dev",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Session.git",
-                "reference": "b24aed6e4ba116cd389c7306a60a42ae9d1979d0"
+                "reference": "9e018278794228e40c7695b699c848bea2355a12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Session/zipball/b24aed6e4ba116cd389c7306a60a42ae9d1979d0",
-                "reference": "b24aed6e4ba116cd389c7306a60a42ae9d1979d0",
+                "url": "https://api.github.com/repos/auraphp/Aura.Session/zipball/9e018278794228e40c7695b699c848bea2355a12",
+                "reference": "9e018278794228e40c7695b699c848bea2355a12",
                 "shasum": ""
             },
             "require": {
@@ -39,6 +39,9 @@
                     "config": {
                         "common": "Aura\\Session\\_Config\\Common"
                     }
+                },
+                "branch-alias": {
+                    "dev-develop-2": "2.0.x-dev"
                 }
             },
             "autoload": {
@@ -66,11 +69,11 @@
                 "session",
                 "sessions"
             ],
-            "time": "2015-07-09 01:21:08"
+            "time": "2015-03-27 18:33:22"
         },
         {
             "name": "psr/http-message",
-            "version": "dev-master",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/http-message.git",
@@ -119,16 +122,16 @@
         },
         {
             "name": "tuum/form",
-            "version": "1.0.0beta1",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TuumPHP/Form.git",
-                "reference": "1732a68cb959b4103f9c3bbf502b8479892d6560"
+                "reference": "9c8fd34685853599df21cd426b00c15173a02dcb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TuumPHP/Form/zipball/1732a68cb959b4103f9c3bbf502b8479892d6560",
-                "reference": "1732a68cb959b4103f9c3bbf502b8479892d6560",
+                "url": "https://api.github.com/repos/TuumPHP/Form/zipball/9c8fd34685853599df21cd426b00c15173a02dcb",
+                "reference": "9c8fd34685853599df21cd426b00c15173a02dcb",
                 "shasum": ""
             },
             "type": "library",
@@ -147,31 +150,31 @@
                     "email": "kamei@workspot.jp"
                 }
             ],
-            "description": "a simple html form generator.",
-            "time": "2015-10-21 05:39:03"
+            "description": "form generator and other template helpers.",
+            "time": "2015-11-22 00:42:02"
         },
         {
             "name": "tuum/respond",
-            "version": "1.x-dev",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TuumPHP/Respond.git",
-                "reference": "59c3e798a7ea0ddd51f9e8a23c36d313bd812893"
+                "reference": "3bbd666757be991ddf2ef70502eee0f3ace281c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TuumPHP/Respond/zipball/59c3e798a7ea0ddd51f9e8a23c36d313bd812893",
-                "reference": "59c3e798a7ea0ddd51f9e8a23c36d313bd812893",
+                "url": "https://api.github.com/repos/TuumPHP/Respond/zipball/3bbd666757be991ddf2ef70502eee0f3ace281c3",
+                "reference": "3bbd666757be991ddf2ef70502eee0f3ace281c3",
                 "shasum": ""
             },
             "require": {
                 "aura/session": "~2.0",
                 "psr/http-message": "~1.0",
-                "tuum/form": "1.0.0beta1"
+                "tuum/form": "^1.0"
             },
             "require-dev": {
                 "koriym/printo": " ~1.0",
-                "tuum/view": "1.0.0beta1",
+                "tuum/view": "^1.0",
                 "twig/twig": "~1.0",
                 "zendframework/zend-diactoros": "~1.0"
             },
@@ -192,20 +195,20 @@
                 }
             ],
             "description": "helpers and responders for PSR7 http/messages.",
-            "time": "2015-11-11 02:09:06"
+            "time": "2015-11-22 23:37:09"
         },
         {
             "name": "tuum/view",
-            "version": "1.x-dev",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TuumPHP/View.git",
-                "reference": "bb46e8cf47f02f6176f51261934580f47a88bf4d"
+                "reference": "549f5115ac788a5747095d0d7a05d59e25ea914d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TuumPHP/View/zipball/bb46e8cf47f02f6176f51261934580f47a88bf4d",
-                "reference": "bb46e8cf47f02f6176f51261934580f47a88bf4d",
+                "url": "https://api.github.com/repos/TuumPHP/View/zipball/549f5115ac788a5747095d0d7a05d59e25ea914d",
+                "reference": "549f5115ac788a5747095d0d7a05d59e25ea914d",
                 "shasum": ""
             },
             "type": "library",
@@ -224,21 +227,21 @@
                     "email": "kamei@workspot.jp"
                 }
             ],
-            "description": "adapters for various view template components.",
-            "time": "2015-10-30 06:10:34"
+            "description": "raw PHP template renderer that does not escape.",
+            "time": "2015-11-20 02:20:34"
         },
         {
             "name": "zendframework/zend-diactoros",
-            "version": "dev-develop",
+            "version": "1.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-diactoros.git",
-                "reference": "f8391f298267f983915585189c9747ec3ba6591b"
+                "reference": "3f0ce6c0ba2106e018fb514a9f09dbb91eb6bfd0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/f8391f298267f983915585189c9747ec3ba6591b",
-                "reference": "f8391f298267f983915585189c9747ec3ba6591b",
+                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/3f0ce6c0ba2106e018fb514a9f09dbb91eb6bfd0",
+                "reference": "3f0ce6c0ba2106e018fb514a9f09dbb91eb6bfd0",
                 "shasum": ""
             },
             "require": {
@@ -275,16 +278,13 @@
                 "psr",
                 "psr-7"
             ],
-            "time": "2015-10-16 15:26:28"
+            "time": "2015-10-16 15:24:05"
         }
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "dev",
-    "stability-flags": {
-        "tuum/respond": 20,
-        "tuum/view": 20
-    },
+    "minimum-stability": "stable",
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
