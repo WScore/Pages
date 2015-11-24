@@ -21,7 +21,7 @@ abstract class AbstractController
     public function invoke(ServerRequestInterface $request)
     {
         $referrer = new Referrer($request);
-        $referrer->load();
+        $request  = $referrer->load($request);
 
         // go invoke this controller!
         $response = new Response();
@@ -29,7 +29,7 @@ abstract class AbstractController
         // done controller.
 
         if ($response) {
-            $referrer->save($response);
+            $referrer->save($request, $response);
         }
         return $response;
     }

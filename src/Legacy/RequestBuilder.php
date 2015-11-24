@@ -4,9 +4,9 @@ namespace WScore\Pages\Legacy;
 use Psr\Http\Message\ServerRequestInterface;
 use Tuum\Respond\Helper\ReqAttr;
 use Tuum\Respond\Helper\ReqBuilder;
+use Tuum\Respond\Helper\ResponderBuilder;
 use Tuum\Respond\Respond;
 use Tuum\Respond\Responder;
-use Tuum\Respond\Service\ErrorView;
 use Tuum\Respond\Service\SessionStorage;
 use Tuum\Respond\Service\TuumViewer;
 
@@ -61,13 +61,10 @@ class RequestBuilder
      */
     public function withResponder($view_dir, $options = [], $name = 'tuum-app')
     {
-        $options  += ['error_option' => [], 'contents_view' => ''];
+        $errors    = isset($options['error_option']) ? $options['error_option']: [];
+        $contents  = isset($options['contents_view']) ? $options['contents_view']: null;
         $viewer    = TuumViewer::forge($view_dir);
-        $responder = Responder::build(
-            $viewer,
-            ErrorView::forge($viewer, $options['error_option']),
-            $options['contents_view']
-        );
+        $responder = ResponderBuilder::withView($viewer, $errors, $contents);
         if (!is_null($name)) {
             $responder = $responder->withSession(SessionStorage::forge($name));
         }

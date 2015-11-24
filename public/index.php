@@ -5,16 +5,13 @@
  * This is for legacy site.
  */
 use Tuum\Respond\Responder;
-use Tuum\Respond\ResponseHelper;
 use WScore\Pages\Legacy\RequestBuilder;
+use Zend\Diactoros\Response\SapiEmitter;
 
 /**
  * load composer's autoloader.
  */
 if (file_exists($file = dirname(__DIR__) . "/vendor/autoload.php")) {
-    /** @noinspection PhpIncludeInspection */
-    require_once $file;
-} elseif (file_exists($file = dirname(dirname(dirname(dirname(__DIR__)))) . "/vendor/autoload.php")) {
     /** @noinspection PhpIncludeInspection */
     require_once $file;
 } else {
@@ -25,7 +22,10 @@ include __DIR__ . "/pages/PageController.php";
 /**
  * build request
  */
-$request = RequestBuilder::forge(__DIR__ . '/pages');
+$request = RequestBuilder::forgeFromGlobal($GLOBALS)
+    ->withResponder(__DIR__ . '/pages')
+    ->withMethod()
+    ->getRequest();
 
 /**
  * invoke controller.
@@ -33,5 +33,6 @@ $request = RequestBuilder::forge(__DIR__ . '/pages');
 $controller = PageController::forge();
 $response   = $controller->invoke($request);
 if ($response) {
-    ResponseHelper::emit($response);
+    $emitter = new SapiEmitter();
+    $emitter->emit($response);
 }

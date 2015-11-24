@@ -1,6 +1,7 @@
 <?php
 
 use Psr\Http\Message\ResponseInterface;
+use Tuum\Respond\Responder\ViewData;
 use WScore\Pages\Base\DispatchByMethodTrait;
 use Tuum\Respond\Responder;
 use WScore\Pages\Legacy\AbstractController;
@@ -31,7 +32,7 @@ class PageController extends AbstractController
     public function onGet($name = null)
     {
         return $this->view()
-            ->with('name', $name)
+            ->withData('name', $name)
             ->asView('top');
     }
 
@@ -42,7 +43,7 @@ class PageController extends AbstractController
     public function onView($view = null)
     {
         return $this
-            ->with(function (\Tuum\Respond\Service\ViewData $data) use ($view) {
+            ->with(function (ViewData $data) use ($view) {
                 $data->setData('view', $view);
 
                 return $data;
@@ -57,7 +58,7 @@ class PageController extends AbstractController
     {
         $name = $this->getPost('name');
         return $this->view()
-            ->with('name', $name)
+            ->withData('name', $name)
             ->asView('post');
     }
 }
