@@ -78,8 +78,8 @@ class Dispatch
      */
     protected function setController($controller)
     {
-        $controller->inject('view', $this->view);
-        $controller->inject('session', $this->session->getSegment('app'));
+        $controller->inject(AbstractController::VIEWER, $this->view);
+        $controller->inject(AbstractController::SESSION, $this->session->getSegment('app'));
         $this->controller = $controller;
     }
 
@@ -99,7 +99,7 @@ class Dispatch
     /**
      * @overwrite this method if necessary.
      */
-    protected function security()
+    protected function preProcess()
     {
         if ($this->request->getMethod() === 'POST') {
             $input = $this->request->getParsedBody();
@@ -152,7 +152,7 @@ class Dispatch
         $inputs = array_merge($this->request->getServerParams(), $this->request->getQueryParams());
         try {
 
-            $this->security();
+            $this->preProcess();
             $this->controller->prepare($this->request);
             $response = $this->execMethod($execMethod, $inputs);
 
@@ -170,5 +170,14 @@ class Dispatch
         }
         return $this->view;
     }
-    // +----------------------------------------------------------------------+
+
+    /**
+     * @param string $action
+     * @return Dispatch
+     */
+    public function setAction($action)
+    {
+        $this->action = $action;
+        return $this;
+    }
 }

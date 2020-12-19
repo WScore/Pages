@@ -25,19 +25,15 @@ abstract class AbstractController
     /**
      * magic methods to call method in a sub-module.
      *
-     * @param string $method
+     * @param string $name
      * @param array $args
      * @return mixed
      * @throws RuntimeException
      */
-    public function __call($method, $args)
+    public function getModule($name, $args)
     {
-        foreach ($this->modules as $object) {
-            if (method_exists($object, $method)) {
-                return call_user_func_array([$object, $method], $args);
-            }
-        }
-        throw new RuntimeException("cannot find method: {$method} in Sub-Modules.");
+        return array_key_exists($name, $this->modules) ?
+            $this->modules[$name] : null;
     }
 
     /**
