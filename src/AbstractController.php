@@ -1,15 +1,16 @@
 <?php
+
 namespace WScore\Pages;
 
 use Aura\Session\Segment;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 
-abstract class ControllerAbstract
+abstract class AbstractController
 {
     const SESSION = 'Session.ID';
     const REQUEST = 'Request.ID';
-    const VIEWER  = 'Viewer.ID';
+    const VIEWER = 'Viewer.ID';
 
     /**
      * @var mixed[]
@@ -26,18 +27,17 @@ abstract class ControllerAbstract
      *
      * @param string $method
      * @param array $args
-     * @throws RuntimeException
      * @return mixed
+     * @throws RuntimeException
      */
-    public function __call( $method, $args )
+    public function __call($method, $args)
     {
-        foreach( $this->modules as $object )
-        {
-            if( method_exists( $object, $method ) ) {
-                return call_user_func_array( [$object,$method], $args );
+        foreach ($this->modules as $object) {
+            if (method_exists($object, $method)) {
+                return call_user_func_array([$object, $method], $args);
             }
         }
-        throw new RuntimeException( "cannot find method: {$method} in Sub-Modules." );
+        throw new RuntimeException("cannot find method: {$method} in Sub-Modules.");
     }
 
     /**
@@ -46,19 +46,20 @@ abstract class ControllerAbstract
      * @param string $name
      * @param object $object
      */
-    public function inject( $name, $object )
+    public function inject($name, $object)
     {
         $this->$name = $object;
-        $this->modules[ $name ] = $object;
+        $this->modules[$name] = $object;
     }
 
     /**
      * overwrite this to prepare controller before on* method.
      * @param ServerRequestInterface $request
      */
-    public function prepare( $request )
+    public function prepare($request)
     {
         $this->inject(self::REQUEST, $request);
+        $this->setFlashMessage();
     }
 
     /**
@@ -66,7 +67,7 @@ abstract class ControllerAbstract
      */
     protected function session()
     {
-        return isset($this->modules[self::SESSION]) ? $this->modules[self::SESSION]: null;
+        return isset($this->modules[self::SESSION]) ? $this->modules[self::SESSION] : null;
     }
 
     /**
@@ -74,7 +75,7 @@ abstract class ControllerAbstract
      */
     protected function pageView()
     {
-        return isset($this->modules[self::VIEWER]) ? $this->modules[self::VIEWER]: null;
+        return isset($this->modules[self::VIEWER]) ? $this->modules[self::VIEWER] : null;
     }
 
     /**
@@ -82,7 +83,7 @@ abstract class ControllerAbstract
      */
     protected function request()
     {
-        return isset($this->modules[self::REQUEST]) ? $this->modules[self::REQUEST]: null;
+        return isset($this->modules[self::REQUEST]) ? $this->modules[self::REQUEST] : null;
     }
     // +----------------------------------------------------------------------+
     //  messages and errors. 
@@ -90,17 +91,17 @@ abstract class ControllerAbstract
     /**
      * @param string $message
      */
-    protected function message( $message )
+    protected function message($message)
     {
-        $this->pageView()->setMessage( $message );
+        $this->pageView()->setMessage($message);
     }
 
     /**
      * @param string $message
      */
-    protected function error( $message )
+    protected function error($message)
     {
-        $this->pageView()->setError( $message );
+        $this->pageView()->setError($message);
     }
 
     /**
@@ -114,6 +115,10 @@ abstract class ControllerAbstract
 
         return $this->pageView();
     }
+
+    // +----------------------------------------------------------------------+
+    //  flash messages
+    // +----------------------------------------------------------------------+
 
     /**
      * @param string $key
@@ -133,25 +138,22 @@ abstract class ControllerAbstract
         return $this->session()->getFlash($key);
     }
 
-    // +----------------------------------------------------------------------+
-    //  flash messages
-    // +----------------------------------------------------------------------+
     /**
      * @param $message
      */
-    protected function flashMessage( $message )
+    protected function flashMessage($message)
     {
-        $this->session()->setFlash( 'flash-message', $message );
-        $this->session()->setFlash( 'flash-error',   false );
+        $this->session()->setFlash('flash-message', $message);
+        $this->session()->setFlash('flash-error', false);
     }
 
     /**
      * @param $message
      */
-    protected function flashError( $message )
+    protected function flashError($message)
     {
-        $this->session()->setFlash( 'flash-message', $message );
-        $this->session()->setFlash( 'flash-error',   true );
+        $this->session()->setFlash('flash-message', $message);
+        $this->session()->setFlash('flash-error', true);
     }
 
     /**
@@ -159,8 +161,8 @@ abstract class ControllerAbstract
      */
     protected function setFlashMessage()
     {
-        if( $message = $this->session()->get('flash-message') ) {
-            if( $this->session()->get('flash-error') ) {
+        if ($message = $this->session()->get('flash-message')) {
+            if ($this->session()->get('flash-error')) {
                 $this->pageView()->setError($message);
             } else {
                 $this->pageView()->setMessage($message);

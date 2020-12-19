@@ -1,4 +1,5 @@
 <?php
+
 namespace WScore\Pages;
 
 use Aura\Session\Session;
@@ -11,17 +12,17 @@ use WScore\Pages\View\Data;
  */
 class PageView
 {
-    const ERROR    = '400';
+    const ERROR = '400';
     const CRITICAL = '500';
 
     const CSRF_TOKEN = '_csrf_token';
 
     /**
-     * for messages. 
-     * 
+     * for messages.
+     *
      * @var bool
      */
-    protected $error   = false;
+    protected $error = false;
 
     /**
      * @var string
@@ -31,7 +32,7 @@ class PageView
     /**
      * @var array
      */
-    protected $contents    = array();
+    protected $contents = array();
 
     /**
      * @var string
@@ -65,9 +66,9 @@ class PageView
     /**
      * @param string $url
      */
-    public function location( $url )
+    public function location($url)
     {
-        header( "Location: {$url}" );
+        header("Location: {$url}");
         exit;
     }
 
@@ -75,11 +76,13 @@ class PageView
      * @param string $viewFile
      * @param array $contents
      */
-    public function setRender( $viewFile, $contents = [] )
+    public function setRender($viewFile, $contents = [])
     {
-        if( !$viewFile ) return;
+        if (!$viewFile) {
+            return;
+        }
         $this->viewFile = $viewFile;
-        if( is_array( $contents ) ) {
+        if (is_array($contents)) {
             $this->contents = $contents + $this->contents;
         }
     }
@@ -96,14 +99,16 @@ class PageView
     /**
      * @param string $message
      */
-    public function setMessage( $message ) {
+    public function setMessage($message)
+    {
         $this->message = $message;
     }
 
     /**
      * @param string $message
      */
-    public function setError( $message ) {
+    public function setError($message)
+    {
         $this->error = self::ERROR;
         $this->message = $message;
     }
@@ -111,7 +116,8 @@ class PageView
     /**
      * @param string $message
      */
-    public function setCritical( $message ) {
+    public function setCritical($message)
+    {
         $this->error = self::CRITICAL;
         $this->message = $message;
     }
@@ -119,26 +125,30 @@ class PageView
     /**
      * @return bool
      */
-    public function isError() {
+    public function isError()
+    {
         return $this->error >= self::ERROR;
     }
 
     /**
      * @return bool
      */
-    public function isCritical() {
+    public function isCritical()
+    {
         return $this->error >= self::CRITICAL;
     }
 
     /**
      * @return string
      */
-    public function getMessage() {
+    public function getMessage()
+    {
         return $this->message;
     }
 
     public function render()
     {
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $view = $this->getContents();
         /** @noinspection PhpIncludeInspection */
         return include $this->viewRoot . '/' . $this->viewFile;

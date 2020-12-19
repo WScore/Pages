@@ -1,9 +1,9 @@
 <?php
 namespace tests\pages\mocks;
 
-use WScore\Pages\ControllerAbstract;
+use WScore\Pages\AbstractController;
 
-class TestController extends ControllerAbstract
+class TestController extends AbstractController
 {
     /**
      * checking if dispatcher executed this method

@@ -10,7 +10,7 @@ $request = ServerRequestFactory::fromGlobals();
 $controller = new TestController();
 
 $view = Dispatch::create($controller, __DIR__ . '/views')
-    ->dispatch($request);
+    ->handle($request);
 
 if ($view->isCritical()) {
     include __DIR__ . '/views/critical.php';

@@ -1,7 +1,6 @@
 <?php
 namespace WScore\Pages\View;
 
-use Aura\Session\Session;
 use WScore\Pages\PageView;
 
 /**
@@ -68,7 +67,7 @@ class Data
     // +----------------------------------------------------------------------+
     //  managing html stuff.
     // +----------------------------------------------------------------------+
-    public function h( $key ) {
+    public function html( $key ) {
         $value = $this->get($key);
         if( is_object($value) && method_exists( $value, '__toString') ) {
             $value = (string) $value;
@@ -99,7 +98,7 @@ class Data
      */
     public function makeCsRfToken()
     {
-        return $this->makeHiddenTag( PageView::CSRF_TOKEN );
+        return $this->makeHiddenTag(PageView::CSRF_TOKEN );
     }
 
     // +----------------------------------------------------------------------+
@@ -125,10 +124,5 @@ class Data
         }
         $html  = "<div class=\"{$class}\">\n{$html}\n</div>";
         return $html;
-    }
-
-    public function render()
-    {
-
     }
 }

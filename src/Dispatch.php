@@ -1,4 +1,5 @@
 <?php
+
 namespace WScore\Pages;
 
 use Aura\Session\Session;
@@ -18,7 +19,7 @@ use RuntimeException;
 class Dispatch
 {
     /**
-     * @var ControllerAbstract
+     * @var AbstractController
      */
     protected $controller;
 
@@ -46,20 +47,20 @@ class Dispatch
     //  construction of dispatch and setting controller object.
     // +----------------------------------------------------------------------+
     /**
-     * @param ControllerAbstract $controller
+     * @param AbstractController $controller
      * @param PageView $view
      * @param Session $session
      */
-    public function __construct( $controller, $view, $session )
+    public function __construct($controller, $view, $session)
     {
-        $this->view    = $view;
+        $this->view = $view;
         $this->session = $session;
         $this->controller = $controller;
         $this->setController($this->controller);
     }
 
     /**
-     * @param ControllerAbstract $controller
+     * @param AbstractController $controller
      * @param string $viewRoot
      * @return Dispatch
      */
@@ -73,16 +74,16 @@ class Dispatch
     }
 
     /**
-     * @param ControllerAbstract $controller
+     * @param AbstractController $controller
      */
-    protected function setController( $controller )
+    protected function setController($controller)
     {
-        $controller->inject( 'view',    $this->view );
-        $controller->inject( 'session', $this->session->getSegment('app'));
+        $controller->inject('view', $this->view);
+        $controller->inject('session', $this->session->getSegment('app'));
         $this->controller = $controller;
     }
 
-    public function dispatch($request)
+    public function handle($request)
     {
         $this->request = $request;
         $method = $this->request->getMethod();
@@ -91,7 +92,7 @@ class Dispatch
         } elseif (isset($this->request->getQueryParams()[$this->action])) {
             $method = $this->request->getQueryParams()[$this->action];
         }
-        $execMethod = 'on' . ucwords( $method );
+        $execMethod = 'on' . ucwords($method);
         return $this->execute($execMethod);
     }
 
@@ -121,52 +122,51 @@ class Dispatch
      * @return array
      * @throws ReflectionException
      */
-    protected function execMethod( $execMethod, $inputs = [] )
+    protected function execMethod($execMethod, $inputs = [])
     {
         $controller = $this->controller;
-        $refMethod  = new ReflectionMethod( $controller, $execMethod );
-        $refArgs    = $refMethod->getParameters();
+        $refMethod = new ReflectionMethod($controller, $execMethod);
+        $refArgs = $refMethod->getParameters();
         $parameters = array();
-        foreach( $refArgs as $arg ) {
-            $key  = $arg->getPosition();
+        foreach ($refArgs as $arg) {
+            $key = $arg->getPosition();
             $name = $arg->getName();
-            $opt  = $arg->isOptional() ? $arg->getDefaultValue() : null;
-            $val  = isset($inputs[$name]) ? $inputs[$name] : $opt;
+            $opt = $arg->isOptional() ? $arg->getDefaultValue() : null;
+            $val = isset($inputs[$name]) ? $inputs[$name] : $opt;
             $parameters[$key] = $val;
-            $this->view->set( $name, $val );
         }
         $refMethod->setAccessible(true);
-        return $refMethod->invokeArgs( $controller, $parameters );
+        return $refMethod->invokeArgs($controller, $parameters);
     }
 
     /**
      * @param string $execMethod
      * @return PageView
      */
-    public function execute( $execMethod )
+    public function execute($execMethod)
     {
-        if( !method_exists( $this->controller, $execMethod ) ) {
-            $this->view->setCritical( 'no such method: ' . $execMethod );
+        if (!method_exists($this->controller, $execMethod)) {
+            $this->view->setCritical('no such method: ' . $execMethod);
             return $this->view;
         }
         $inputs = array_merge($this->request->getServerParams(), $this->request->getQueryParams());
         try {
 
             $this->security();
-            $this->controller->prepare( $this->request );
-            $response = $this->execMethod( $execMethod, $inputs );
+            $this->controller->prepare($this->request);
+            $response = $this->execMethod($execMethod, $inputs);
 
-            if( $response instanceof PageView) {
+            if ($response instanceof PageView) {
                 $this->view = $response;
                 return $response;
             }
-            if (is_array($response)) {
-                $this->view->assign($response);
+            if (is_string($response)) {
+                $this->view->setRender($response);
                 return $this->view;
             }
 
-        } catch( Exception $e ) {
-            $this->view->setCritical( $e->getMessage() );
+        } catch (Exception $e) {
+            $this->view->setCritical($e->getMessage());
         }
         return $this->view;
     }
