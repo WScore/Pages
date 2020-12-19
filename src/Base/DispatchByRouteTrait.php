@@ -1,0 +1,91 @@
+<?php
+namespace WScore\Pages\Base;
+
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Tuum\Respond\Helper\ReqAttr;
+use Tuum\Respond\Responder\View;
+
+trait DispatchByRouteTrait
+{
+    /**
+     * @return array
+     */
+    abstract protected function getRoutes();
+
+    /**
+     * @return string
+     */
+    abstract protected function getPathInfo();
+
+    /**
+     * @return View
+     */
+    abstract protected function view();
+
+    /**
+     * @return ServerRequestInterface
+     */
+    abstract protected function getRequest();
+
+    /**
+     * @param string $dispatch
+     * @param array  $params
+     * @return ResponseInterface
+     */
+    abstract protected function dispatchMethod($dispatch, $params);
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return null|ResponseInterface
+     */
+    protected function dispatch(ServerRequestInterface $request)
+    {
+        $method = ReqAttr::getMethod($request);
+        $path   = $this->getPathInfo();
+        if (strtoupper($method) === 'OPTIONS') {
+            return $this->onOptions($path);
+        }
+
+        return $this->dispatchRoute($path, $method);
+    }
+
+    /**
+     * @param string $path
+     * @return ResponseInterface
+     */
+    private function onOptions($path)
+    {
+        $routes  = $this->getRoutes();
+        $options = ['OPTIONS', 'HEAD'];
+        foreach ($routes as $pattern => $dispatch) {
+            if ($params = Matcher::verify($pattern, $path, '*')) {
+                if (isset($params['method']) && $params['method'] && $params['method'] !== '*') {
+                    $options[] = strtoupper($params['method']);
+                }
+            }
+        }
+        $options = array_unique($options);
+        sort($options);
+        $list = implode(',', $options);
+        return $this->view()->asResponse('', 200, ['Allow' => $list]);
+    }
+
+    /**
+     * @param string  $path
+     * @param string  $method
+     * @return ResponseInterface|null
+     */
+    private function dispatchRoute($path, $method)
+    {
+        $routes = $this->getRoutes();
+        foreach ($routes as $pattern => $dispatch) {
+            $params = Matcher::verify($pattern, $path, $method);
+            if (!empty($params)) {
+                $params += $this->getRequest()->getQueryParams() ?: [];
+                return $this->dispatchMethod($dispatch, $params);
+            }
+        }
+        return null;
+    }
+}

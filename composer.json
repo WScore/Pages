@@ -8,9 +8,10 @@
             "email": "kamei@workspot.jp"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
-
+        "tuum/respond":"^1.0",
+        "tuum/view":"^1.0",
+        "zendframework/zend-diactoros":"^1.0"
     },
     "autoload": {
         "psr-4" : {
