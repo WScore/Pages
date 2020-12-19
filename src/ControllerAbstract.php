@@ -1,36 +1,20 @@
 <?php
 namespace WScore\Pages;
 
+use Aura\Session\Segment;
+use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
+
 abstract class ControllerAbstract
 {
-    const SAVE_POST_ID = '_savedPost';
-    /**
-     * @var PageView
-     */
-    protected $view;
+    const SESSION = 'Session.ID';
+    const REQUEST = 'Request.ID';
+    const VIEWER  = 'Viewer.ID';
 
     /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @var object[]
+     * @var mixed[]
      */
     protected $modules = array();
-
-    /**
-     * a quick way to setup a view based on method.
-     * ex: [ 'method1' => [ 'key1'=>'value1', ... ], ]
-     *
-     * @var array[]
-     */
-    protected $methodView = array();
 
     protected $currentView = array();
 
@@ -42,7 +26,7 @@ abstract class ControllerAbstract
      *
      * @param string $method
      * @param array $args
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @return mixed
      */
     public function __call( $method, $args )
@@ -53,7 +37,7 @@ abstract class ControllerAbstract
                 return call_user_func_array( [$object,$method], $args );
             }
         }
-        throw new \RuntimeException( "cannot find method: {$method} in Sub-Modules." );
+        throw new RuntimeException( "cannot find method: {$method} in Sub-Modules." );
     }
 
     /**
@@ -70,71 +54,36 @@ abstract class ControllerAbstract
 
     /**
      * overwrite this to prepare controller before on* method.
-     * @param string $method
+     * @param ServerRequestInterface $request
      */
-    public function beginController( $method )
+    public function prepare( $request )
     {
-        $this->request->loadPost( ControllerAbstract::SAVE_POST_ID );
-        $this->setCurrentMethod( $method );
+        $this->inject(self::REQUEST, $request);
     }
 
     /**
-     * overwrite this to finish controller after on* method.
+     * @return Segment|null
      */
-    public function finishController() {}
-
-    /**
-     * @param array $data
-     */
-    protected function savePost( $data=array() )
+    protected function session()
     {
-        $packed = $this->request->packPost( $data );
-        $this->view->pass( ControllerAbstract::SAVE_POST_ID, $packed );
-    }
-
-    // +----------------------------------------------------------------------+
-    //  sort of Response class. 
-    // +----------------------------------------------------------------------+
-    /**
-     * @param string $url
-     */
-    protected function location( $url )
-    {
-        $this->view->location( $url );
-    }
-    
-    // +----------------------------------------------------------------------+
-    //  C.S.R.F. tokens
-    // +----------------------------------------------------------------------+
-    /**
-     * pushes token to session and view objects.
-     */
-    protected function pushToken()
-    {
-        $token = $this->session->pushToken();
-        $this->view->set( Session::TOKEN_ID, $token );
+        return isset($this->modules[self::SESSION]) ? $this->modules[self::SESSION]: null;
     }
 
     /**
-     * @return bool
+     * @return PageView|null
      */
-    protected function verifyToken()
+    protected function pageView()
     {
-        $token = $this->request->getCode( Session::TOKEN_ID );
-        if( !$this->session->verifyToken( $token ) ) {
-            return false;
-        }
-        return true;
+        return isset($this->modules[self::VIEWER]) ? $this->modules[self::VIEWER]: null;
     }
 
     /**
-     *
+     * @return ServerRequestInterface|null
      */
-    protected function undoToken()
+    protected function request()
     {
-        $this->session->undoToken();
+        return isset($this->modules[self::REQUEST]) ? $this->modules[self::REQUEST]: null;
     }
-
     // +----------------------------------------------------------------------+
     //  messages and errors. 
     // +----------------------------------------------------------------------+
@@ -143,7 +92,7 @@ abstract class ControllerAbstract
      */
     protected function message( $message )
     {
-        $this->view->message( $message );
+        $this->pageView()->setMessage( $message );
     }
 
     /**
@@ -151,16 +100,37 @@ abstract class ControllerAbstract
      */
     protected function error( $message )
     {
-        $this->view->error( $message );
+        $this->pageView()->setError( $message );
     }
 
     /**
-     * @param string $message
-     * @throws \RuntimeException
+     * @param string $viewFile
+     * @param array $contents
+     * @return PageView|null
      */
-    protected function critical( $message )
+    protected function render($viewFile, $contents = [])
     {
-        throw new \RuntimeException( $message );
+        $this->pageView()->setRender($viewFile, $contents);
+
+        return $this->pageView();
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     */
+    protected function setFlash($key, $value)
+    {
+        $this->session()->setFlash($key, $value);
+    }
+
+    /**
+     * @param string $key
+     * @return mixed|null
+     */
+    protected function getFlash($key)
+    {
+        return $this->session()->getFlash($key);
     }
 
     // +----------------------------------------------------------------------+
@@ -171,8 +141,8 @@ abstract class ControllerAbstract
      */
     protected function flashMessage( $message )
     {
-        $this->session->flash( 'flash-message', $message );
-        $this->session->flash( 'flash-error',   false );
+        $this->session()->setFlash( 'flash-message', $message );
+        $this->session()->setFlash( 'flash-error',   false );
     }
 
     /**
@@ -180,8 +150,8 @@ abstract class ControllerAbstract
      */
     protected function flashError( $message )
     {
-        $this->session->flash( 'flash-message', $message );
-        $this->session->flash( 'flash-error',   true );
+        $this->session()->setFlash( 'flash-message', $message );
+        $this->session()->setFlash( 'flash-error',   true );
     }
 
     /**
@@ -189,66 +159,12 @@ abstract class ControllerAbstract
      */
     protected function setFlashMessage()
     {
-        if( $message = $this->session->get('flash-message') ) {
-            if( $this->session->get('flash-error') ) {
-                $this->view->error($message);
+        if( $message = $this->session()->get('flash-message') ) {
+            if( $this->session()->get('flash-error') ) {
+                $this->pageView()->setError($message);
             } else {
-                $this->view->message($message);
+                $this->pageView()->setMessage($message);
             }
         }
     }
-
-    // +----------------------------------------------------------------------+
-    //  utilities
-    // +----------------------------------------------------------------------+
-    /**
-     * @param $method
-     * @param bool $view
-     */
-    protected function setCurrentMethod( $method, $view=true )
-    {
-        $this->view->setCurrentMethod( $method );
-        if( $view &&
-            isset( $this->currentView[$method] ) &&
-            is_array( $this->currentView[$method] ) ) {
-            $this->view->assign( $this->currentView[$method] );
-        }
-    }
-
-    /**
-     * @param $method
-     * @param bool $view
-     */
-    protected function setMethod( $method, $view=true )
-    {
-        $this->view->setMethod( $method );
-        if( $view &&
-            isset( $this->methodView[$method] ) &&
-            is_array( $this->methodView[$method] ) ) {
-            $this->view->assign( $this->methodView[$method] );
-        }
-    }
-
-    /**
-     * @param $value
-     * @return bool
-     */
-    protected function isSafe( & $value )
-    {
-        if( !$value ) return false;
-        if( preg_match( '/^[-_a-zA-Z0-9]*$/', $value ) ) return true;
-        return false;
-    }
-
-    /**
-     * @param $key
-     * @param $value
-     * @return $this
-     */
-    protected function set( $key, $value )
-    {
-        $this->view->set( $key, $value );
-        return $this;
-    }
-    // +----------------------------------------------------------------------+
 }

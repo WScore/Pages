@@ -1,6 +1,14 @@
 <?php
 namespace WScore\Pages;
 
+use Aura\Session\Session;
+use Aura\Session\SessionFactory;
+use Exception;
+use Psr\Http\Message\ServerRequestInterface;
+use ReflectionException;
+use ReflectionMethod;
+use RuntimeException;
+
 /**
  * A simple page-based controller.
  *
@@ -15,7 +23,7 @@ class Dispatch
     protected $controller;
 
     /**
-     * @var Request
+     * @var ServerRequestInterface
      */
     protected $request;
 
@@ -29,88 +37,101 @@ class Dispatch
      */
     protected $view;
 
+    /**
+     * @var string
+     */
+    private $action = 'act';
+
     // +----------------------------------------------------------------------+
     //  construction of dispatch and setting controller object.
     // +----------------------------------------------------------------------+
     /**
-     * @param Request $request
+     * @param ControllerAbstract $controller
      * @param PageView $view
-     * @param null|Session $session
+     * @param Session $session
      */
-    public function __construct( $request, $view, $session=null )
+    public function __construct( $controller, $view, $session )
     {
-        $this->request = $request;
         $this->view    = $view;
-        $this->session = $session ?: Session::getInstance();
+        $this->session = $session;
+        $this->controller = $controller;
+        $this->setController($this->controller);
+    }
+
+    /**
+     * @param ControllerAbstract $controller
+     * @param string $viewRoot
+     * @return Dispatch
+     */
+    public static function create($controller, $viewRoot)
+    {
+        $factory = new SessionFactory();
+        $session = $factory->newInstance($_COOKIE);
+        $view = new PageView($session, $viewRoot);
+
+        return new Dispatch($controller, $view, $session);
     }
 
     /**
      * @param ControllerAbstract $controller
      */
-    public function setController( $controller )
+    protected function setController( $controller )
     {
         $controller->inject( 'view',    $this->view );
-        $controller->inject( 'request', $this->request );
-        $controller->inject( 'session', $this->session );
+        $controller->inject( 'session', $this->session->getSegment('app'));
         $this->controller = $controller;
     }
 
-    /**
-     * @param $controller
-     * @return $this
-     */
-    public static function getInstance( $controller )
+    public function dispatch($request)
     {
-        /** @var self $me */
-        $me = new static(
-            new Request(),
-            new PageView()
-        );
-        $me->setController( $controller );
-        return $me;
+        $this->request = $request;
+        $method = $this->request->getMethod();
+        if (isset($this->request->getParsedBody()[$this->action])) {
+            $method = $this->request->getParsedBody()[$this->action];
+        } elseif (isset($this->request->getQueryParams()[$this->action])) {
+            $method = $this->request->getQueryParams()[$this->action];
+        }
+        $execMethod = 'on' . ucwords( $method );
+        return $this->execute($execMethod);
     }
 
     /**
-     * @return PageView
+     * @overwrite this method if necessary.
      */
-    public function getView()
+    protected function security()
     {
-        return $this->view;
+        if ($this->request->getMethod() === 'POST') {
+            $input = $this->request->getParsedBody();
+            $token = isset($input[PageView::CSRF_TOKEN]) ? $input[PageView::CSRF_TOKEN] : null;
+            if (!$token) {
+                throw new RuntimeException('Please set CSRF token.');
+            }
+            if (!$this->session->getCsrfToken()->isValid($token)) {
+                throw new RuntimeException('Invalid CSRF token.');
+            }
+        }
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * @return Session
-     */
-    public function getSession()
-    {
-        return $this->session;
-    }
     // +----------------------------------------------------------------------+
     //  execution of controllers. 
     // +----------------------------------------------------------------------+
     /**
-     * @param $execMethod
+     * @param string $execMethod
+     * @param array $inputs
      * @return array
+     * @throws ReflectionException
      */
-    protected function execMethod( $execMethod )
+    protected function execMethod( $execMethod, $inputs = [] )
     {
         $controller = $this->controller;
-        $refMethod  = new \ReflectionMethod( $controller, $execMethod );
+        $refMethod  = new ReflectionMethod( $controller, $execMethod );
         $refArgs    = $refMethod->getParameters();
         $parameters = array();
         foreach( $refArgs as $arg ) {
             $key  = $arg->getPosition();
             $name = $arg->getName();
             $opt  = $arg->isOptional() ? $arg->getDefaultValue() : null;
-            $val  = $this->request->get( $name, $opt );
+            $val  = isset($inputs[$name]) ? $inputs[$name] : $opt;
             $parameters[$key] = $val;
             $this->view->set( $name, $val );
         }
@@ -119,28 +140,33 @@ class Dispatch
     }
 
     /**
-     * @param null|string $method
+     * @param string $execMethod
      * @return PageView
      */
-    public function execute( $method=null )
+    public function execute( $execMethod )
     {
-        if( !$method ) $method = $this->request->getMethod();
-        $this->view->setCurrentMethod( $method );
-        $execMethod = 'on' . ucwords( $method );
-
+        if( !method_exists( $this->controller, $execMethod ) ) {
+            $this->view->setCritical( 'no such method: ' . $execMethod );
+            return $this->view;
+        }
+        $inputs = array_merge($this->request->getServerParams(), $this->request->getQueryParams());
         try {
 
-            if( !method_exists( $this->controller, $execMethod ) ) {
-                throw new \RuntimeException( 'no method: ' . $method );
-            }
-            $this->controller->beginController( $method );
-            if( $contents = $this->execMethod( $execMethod ) ) {
-                $this->view->assign( $contents );
-            }
-            $this->controller->finishController();
+            $this->security();
+            $this->controller->prepare( $this->request );
+            $response = $this->execMethod( $execMethod, $inputs );
 
-        } catch( \Exception $e ) {
-            $this->view->critical( $e->getMessage() );
+            if( $response instanceof PageView) {
+                $this->view = $response;
+                return $response;
+            }
+            if (is_array($response)) {
+                $this->view->assign($response);
+                return $this->view;
+            }
+
+        } catch( Exception $e ) {
+            $this->view->setCritical( $e->getMessage() );
         }
         return $this->view;
     }
