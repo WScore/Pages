@@ -3,8 +3,11 @@
 use Laminas\Diactoros\ServerRequestFactory;
 use WScore\Pages\Dispatch;
 
+ini_set('display_errors', true);
+
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/views/DemoController.php';
+require_once __DIR__ . '/Demo/DemoForm.php';
 
 $request = ServerRequestFactory::fromGlobals();
 $controller = new DemoController();
@@ -33,6 +36,16 @@ if ($view->isCritical()) {
         }
         div.alert-danger {
             border: 2px solid red;
+        }
+        label.form-label {
+            display: block;
+            margin: 1em 0 .5em 0;
+            color: #666666;
+            font-weight: bold;
+        }
+        label.choice-items {
+            display: inline-block;
+            width: 7em;
         }
     </style>
 </head>

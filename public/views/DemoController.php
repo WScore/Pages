@@ -1,11 +1,15 @@
 <?php
 
 
-class DemoController extends \WScore\Pages\AbstractController
+use WScore\Pages\AbstractController;
+
+class DemoController extends AbstractController
 {
     public function onGet()
     {
-        return $this->render('form.php');
+        return $this->render('form.php', [
+            'form' => new DemoForm([], []),
+        ]);
     }
 
     public function onConfirm()
