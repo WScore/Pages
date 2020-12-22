@@ -11,6 +11,7 @@ class DemoForm
      * @var Values
      */
     private $values;
+
     /**
      * @var Form
      */
@@ -35,12 +36,7 @@ class DemoForm
      */
     public function gender()
     {
-        return $this->forms->listInputs('radio', [
-            'ALL' => 'All Gender',
-            'MALE' => 'Male',
-            'FEMALE' => 'Female',
-            'NOT_SAY' => 'Not Say',
-        ], 'gender');
+        return $this->forms->listInputs('radio', GenderType::choices(), 'gender');
     }
 
     /**
@@ -50,5 +46,14 @@ class DemoForm
     {
         return $this->forms->makeTextArea('comment')
             ->addAttribute('style', 'width: 30em; height: 8em;');
+    }
+
+    /**
+     * @param string $key
+     * @return string
+     */
+    public function error($key)
+    {
+        return $this->values->error($key);
     }
 }

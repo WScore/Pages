@@ -157,12 +157,21 @@ abstract class AbstractController
      */
     protected function setFlashMessage()
     {
-        if ($message = $this->session()->get('flash-message')) {
-            if ($this->session()->get('flash-error')) {
+        if ($message = $this->session()->getFlash('flash-message')) {
+            if ($this->session()->getFlash('flash-error')) {
                 $this->pageView()->setError($message);
             } else {
                 $this->pageView()->setMessage($message);
             }
         }
+    }
+
+    /**
+     * @param string $location
+     */
+    protected function location($location)
+    {
+        header("Location: {$location}");
+        exit;
     }
 }

@@ -6,8 +6,11 @@ use WScore\Pages\Dispatch;
 ini_set('display_errors', true);
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/views/DemoController.php';
+require_once __DIR__ . '/Demo/DemoController.php';
+require_once __DIR__ . '/Demo/DemoValues.php';
 require_once __DIR__ . '/Demo/DemoForm.php';
+require_once __DIR__ . '/Demo/DemoValidation.php';
+require_once __DIR__ . '/Demo/GenderType.php';
 
 $request = ServerRequestFactory::fromGlobals();
 $controller = new DemoController();
@@ -47,13 +50,18 @@ if ($view->isCritical()) {
             display: inline-block;
             width: 7em;
         }
+        span.error {
+            color: red;
+        }
     </style>
 </head>
 <body>
 <header>
-    this is header
+    <a href="/">this is header</a>
 </header>
 <?php
+echo $view->getContents()->alert();
+
 $view->render();
 ?>
 </body>

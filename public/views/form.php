@@ -14,10 +14,12 @@ $form = $contents->get('form');
     <div>
         <label for="user_name" class="form-label">User Name</label>
         <?= $form->userName(); ?>
+        <?= $form->error('user_name'); ?>
     </div>
     <div>
         <label for="gender" class="form-label">Gender</label>
         <?= $form->gender(); ?>
+        <?= $form->error('gender'); ?>
     </div>
 
     <div>
