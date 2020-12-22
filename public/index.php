@@ -12,6 +12,10 @@ $controller = new DemoController();
 $view = Dispatch::create($controller, __DIR__ . '/views')
     ->handle($request);
 
+if ($view->isCritical()) {
+    $view->setRender('critical.php');
+}
+
 ?>
 <!Document html>
 <html lang="en">
@@ -37,9 +41,6 @@ $view = Dispatch::create($controller, __DIR__ . '/views')
     this is header
 </header>
 <?php
-if ($view->isCritical()) {
-    $view->setRender('critical.php');
-}
 $view->render();
 ?>
 </body>

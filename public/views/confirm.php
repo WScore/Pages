@@ -7,4 +7,4 @@ $contents = $this->getContents();
 ?>
 this is confirm.
 
-<?php var_dump($contents); ?>
+<?php var_dump($contents->get()); ?>
