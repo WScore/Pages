@@ -16,7 +16,8 @@
     },
     "require": {
         "laminas/laminas-diactoros": "^1.8",
-        "aura/session": "^2.1"
+        "aura/session": "^2.1",
+        "ext-mbstring": "*"
     },
     "autoload": {
         "psr-4" : {
