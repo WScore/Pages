@@ -1,12 +1,15 @@
 WScore.Pages
 ============
 
-A simple page controller package for legacy php code.
+A page controller for good and old (and notorious) PHP code.
 
-This package provides a plain, simple, and easy to use
-page controller (i.e. dispatcher) for good old legacy
-php code, with a high hope to ease the maintenance of
-old and painful php code. Yap, this is for myself.
+This is a component created with the hope that it will make things a little easier for people (i.e. me) who have to maintain PHP code written in the old style.
+
+For example, the following
+
+`http://example.com/example.php`
+
+The goal is to give you the freedom to develop with controllers, even if you access PHP directly.
 
 ### License
 
@@ -14,229 +17,188 @@ MIT License
 
 ### Installation
 
-As usual, use composer to install this repository for your project.
-Not version is set currently.
+PHP 5.6 is targeted.
+only available in ~~beta~~ alpha version.
 
-```json
-"require": {
-    "wscore/pages":"dev-master"
-}
+```sh
+composer require "wscore/pages: ^0.1"
 ```
 
-Quick Overview
---------------
+### Demo
 
-Quite ordinary setups.
-
-1.   Prepare ```Controller``` class, and construct it.
-2.   Construct the ```Dispatcher```, the application.
-3.   Execute the dispatcher. and get the result ```View``` object.
-4.   Use the ```View``` object to generate HTML.
-
-A sample dispatcher code.
-
-```php
-$app = \WScore\Pages\Factory::getDispatch(
-    new MyController( new MyDao() )
-);
-$view = $app->execute();
+```sh
+git clone https://github.com/WScore/Pages
+cd Pages
+composer install
+cd public
+php -S localhost:8000 index.php
 ```
 
-The dispatcher executes the controller's method
- based on http method name, such as onGet, onPost.
- To overwrite the http method, use ```_method``` value.
+Access `localhost:8000` in your browser.
 
-You can specify the method to execute, as well.
+Simple Usage
+----------
+
+It's relatively normal. 
+
+1. create a `Controller` for the page and generate an object. 
+2. Execute the controller with `Dispatch`. 
+3. Create an HTML page under the directory for the view.
+
+### Create a Controller.
+
+Create it by inheriting from `ControllerAbstract`.
 
 ```php
-$view = $app->execute( 'index' ); // executes onIndex.
-```
+use WScore\Pages\AbstractController;
 
-
-### a simple Controller class
-
-extend ```ControllerAbstract``` class.
-
-```php
-class MyController extends ControllerAbstract {
-    protected $dao;
-    public_function __construct( $dao ) {
-        $this->dao = $dao;
-    }
-    public function onIndex() {
-        return $this->dao->getAll();
+class MyController extends AbstractController {
+    private $user;
+    public function __construct($loginUser) {
+        $this->user = $loginUser;
     }
     public function onGet($id) {
-        $data = $this->dao->find($id)
-        $this->pass( 'id', $id );
-        $this->set(  'data', $data );
-        return [ 'title' => 'Got A Data!' ];
+        return $this->render('user.php', [
+            'user' => $this->user,
+        ]);
     }
 }
 ```
 
-The arguments in the on-methods are populated with values
- in the $_REQUEST. ```null``` is set if value is not found.
+### Run the controller.
 
-To set value in the view, use ```set``` method. Or, return
- an array from the on-method.
+Execute (`Dispatch`) the Controller in a PHP file.
 
-Also, using ```pass``` method, the value will be passed
-to the next request via hidden tags.
-
-
-
-### View and HTML
-
-The ```$view``` object keeps the value set in the
- controller. The values can be accessed as an array;
- and the values are htmlspecialchars-ized.
 
 ```php
-echo $view['title'];        // shows 'Got A Data'
-$data = $view->get('data'); // get the data
-echo $view->getPass();      // outputs hidden tags for id
-$view->is( '_method', 'get' );
+use Laminas\Diactoros\ServerRequestFactory;
+use WScore\Pages\Dispatch;
+
+$request = ServerRequestFactory::fromGlobals();
+$controller = new DemoController();
+
+$view = Dispatch::create($controller, __DIR__ . '/views')
+    ->handle($request);
+$view->render();
 ```
 
-to get the raw data, use ```get``` method.
+`Dispatch` is used for session management and CSRF token checking.
 
-FYI, ```is``` method is also available.
+The method name of the controller to be executed is determined from one of the following.
+
+- From the HTTP method name.
+- From the value of "act" of GET/POST, `onMethod` is called.
+
+If you access the site normally, `onGet` will be called.
+If you post with a form, it is `onPost`.
+
+### View file
+
+In the sample code, "`__DIR__ . '/views'`" in the sample code is the directory for views.
+
+Create "`user.php`" in this directory.
 
 ```php
-$view->is( '_current_method', 'get' );  // check the current method.
-$view->is( '_method', ['put','post'] ); // check the next method.
+use WScore\Pages\View\Data;
+/** @var Data $_view */
+
+$user = $_view->get('user');
+?>
+<! -- show user -->
 ```
 
+- `$this` is the object to return from the controller Dispatch (`PaveView`).
+- `$view` is an object that holds parameters for drawing (`Data`).
 
-Advanced Features
------------------
+Other Functions
+----------
 
-### error handling using $view object
+### CSRF tokens.
 
-To handle errors in the controller, use ```critical```,
- ```error```, or ```message``` inside the Controller to
- manage the errors.
+Outputs a CSRF token from the `$view` object.
 
 ```php
-class MyController extends ControllerAbstract {
-    public function onGet($id) {
-        if( !$id ) {
-            $this->critical( 'no id!' ); // throws an exception.
-        }
-        if( !$data = $this->dao->find($id) ) {
-            $this->error( 'no such id: '.$id ); // set error message.
-        } else {
-            $this->message( 'found a data!' );  // show this message.
-        }
-        return [ 'title' => 'Got A Data!' ];
+use WScore\Pages\View\Data;
+/** @var Data $_view */
+
+echo $_view->makeCsRfToken();
+```
+
+Whenever posted, check for a CSRF token.
+If the check fails, it will result in a Critical error.
+
+### Critical error.
+
+This is a special error for `PageView`.
+
+```php
+use WScore\Pages\PageView;
+/** @var PageView $view */
+
+if ($view->isCritical()) {
+    $view->setRender('critical.php');
+}
+$view->render();
+```
+
+- [ ] If you catch an exception when executing the controller, it will be a Critical error.
+
+### Messages and Flushing
+
+You can specify a message in the controller's `message` and `error`.
+
+```php
+use WScore\Pages\AbstractController;
+
+class MsgController extends AbstractController
+{
+    public function onGet()
+    {
+        $this->message('please try this demo!');
+        $this->error('maybe not!');
+        return $this->render('message.php');
     }
 }
+```
 
-// .... and in the php script...
+In view PHP, you can display messages, as;
 
-$view = $app->execute('get');
+```php
+use WScore\Pages\PageView;
+/** @var PageView $view */
 
 echo $view->alert();
-if( $view->isCritical() ) {
-    // do nothing?
-} elseif( $view->isError() ) {
-    // do something?
-} else {
-    // do show some data?
-}
 ```
 
-Use ```alert``` method to display the messages.
- Use different style and class if there is an error.
- Use ```is{Critical|Error}``` to check the error status.
-
-
-
-### C.S.R.F. Token
-
-Generates token for Cross Site Resource Forgeries (CSRF).
- This is a sample code to be used in the beginController
- method.
+### Flash message
 
 ```php
-class MyController extends ControllerAbstract
-    public function beginController( $method )
+use WScore\Pages\AbstractController;
+
+class MsgController extends AbstractController
+{
+    public function onGet()
     {
-        parent::beginController( $method );
-        if( in_array( $method, [ 'add', 'mod', 'del' ] ) ) {
-            $this->pushToken();
-        }
-        elseif( in_array( $method, [ 'post', 'put', 'delete' ] ) ) {
-            if( !$this->verifyToken() ) {
-                throw new \RuntimeException('cannot reload.' );
-            }
-        }
+        $this->flashMessage('thank you!');
+        $this->flashError('sorry!');
+        return $this->location('example.php');
     }
 }
-/// in html
-$view->getPass(); // トークンも一緒に出力される。
-```
+````
 
-Ah, well, the beginController method is a method
- that is called always before the execution.
+With the same PHP code as the message, you can display.
 
 
-### flash messages
+### XSS protection
 
-Use ```flash{Message|Error}``` to set flash messages
- in the session data, and use ```setFlashMessage()```
- method to retrieve the message in the next page.
- The flash message is thrown out if not used.
+t.b.w.
 
-```php
-class MyController extends ControllerAbstract
-    public function onPut($id) {
-        if( $this->dao->update( $data ) {
-            $this->flashMessage( 'updated done!' );
-        } else {
-            $this->flashError( 'Ooops, not updated!!!' );
-        }
-        $this->location( '.../' ); // to onGet.
-    }
-    public function onGet($id) {
-        $this->setFlashMessage();
-    }
-}
-/// in html
-echo $view->alert(); // shows the flash message.
-```
+### HTML Forms
 
-### automatic view setup based on HTTP method
+t.b.w
 
-A lot of HTML values, such as title, breadcrumbs,
- and button names, can be determined based on the
- http method. So, there is a feature to do that
- automatically.
+# Credits
 
-```php
-class MyController extends ControllerAbstract
-    protected $currentView = array(
-        'modForm' => [
-            'curr_title'              => 'Modification Form',
-            '_method'                 => 'put',
-            PageView::BUTTON_VALUE    => 'modify data',
-            PageView::SUB_BUTTON_TYPE => 'reset',
-        ],
-        'put' => [
-            'curr_title'              => 'update complete',
-            '_method'                 => 'index',
-            PageView::BUTTON_VALUE    => 'list data',
-            PageView::SUB_BUTTON_TYPE => 'none',
-        ],
-    );
-    public function beginController( $method ) {
-        $this->setCurrentMethod( $method );
-    }
-}
-```
+README.md translated with www.DeepL.com/Translator (free version).
 
-The automation takes place in the beginController
- method using setCurrentMethod method. Please write
- your own code if beginController is overloaded.
-
+then some fixed by me.
