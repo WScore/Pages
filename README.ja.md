@@ -6,232 +6,195 @@ WScore.Pages
 古いスタイルで書かれたコードを保守しなければいけない人（自分）が
 少しでも楽になるようにと祈りつつ作成されたコンポーネントです。
 
+例えば、次のように
+
+`http://example.com/example.php`
+
+直接PHPにアクセスする場合でも、コントローラを使った自由な開発をすることが目的です。
+
 ### ライセンス
 
 MIT License
 
 ### インストール
 
-コンポーザーを使ってください。バージョンは「dev-master」しか
-準備してありません。
+PHP5.6が対象です。 
+まだ~~ベータ~~α版のみです。
 
-```json
-"require": {
-    "wscore/pages":"dev-master"
-}
+```sh
+composer require "wscore/pages: ^0.1"
 ```
+
+### デモ
+
+```sh
+git clone https://github.com/WScore/Pages
+cd Pages
+composer install
+cd public
+php -S localhost:8000 index.php
+```
+
+ブラウザーで`localhost:8000`にアクセスしてください。
 
 簡単な使い方
 ----------
 
 比較的普通だと思います。
 
-1.   ページ用の ```Controller``` を作成し、オブジェクトを生成する。
-2.   ```Dispatch`` でコントローラー内のメソッドを実行する。
-3.   結果は ```View``` オブジェクトなので、適宜HTMLを構成する。
+1. ページ用の `Controller` を作成し、オブジェクトを生成する。
+2. `Dispatch` でコントローラーを実行する。
+3. HTMLページをビュー用ディレクトリ以下に作成する。
 
-### 簡単なController
+### Controllerを作成する
 
-ControllerAbstractを継承して作成します。
+`ControllerAbstract`を継承して作成します。
 
 ```php
-class MyController extends ControllerAbstract {
-    protected $dao;
-    public_function __construct( $dao ) {
-        $this->dao = $dao;
-    }
-    public function onIndex() {
-        return $this->dao->getAll();
+use WScore\Pages\AbstractController;
+
+class MyController extends AbstractController {
+    private $user;
+    public function __construct($loginUser) {
+        $this->user = $loginUser;
     }
     public function onGet($id) {
-        $data = $this->dao->find($id)
-        $this->pass( 'id', $id );
-        $this->set(  'data', $data );
-        return [ 'title' => 'Got A Data!' ];
+        return $this->render('user.php', [
+            'user' => $this->user,
+        ]);
     }
 }
 ```
 
-HTTPメソードを元に、```onHttpMethodName``` を実行します。
-例えば、HTTPメソッドが```get```なら```onGet```が実行されます。
-HTTPメソッドの上書きは```_method```変数を使います。
+### コントローラーを実行する
 
-メソッドの引数を指定すると、変数名と同じ値を$_REQUESTから
-探して設定します。例の場合は```$_REQUEST['id']```の値に
-なります。見つからない場合はnullが帰ります。
+PHPファイル内で、Controllerを実行（`Dispatch`）します。
 
-ビューに値を設定するには```set```を使います。
-あるいは、最後に配列を返すことでも設定できます。
-
-また、```pass```を使うと、次のリクエストに渡すための
-hiddenタグに出力することが出来ます。
-
-### Dispatchコード
-
-ファクトリを使うと簡単です。
 
 ```php
-$app = \WScore\Pages\Factory::getDispatch(
-    new MyController( new MyDao() )
-);
-$view = $app->execute();
+use Laminas\Diactoros\ServerRequestFactory;
+use WScore\Pages\Dispatch;
+
+$request = ServerRequestFactory::fromGlobals();
+$controller = new DemoController();
+
+$view = Dispatch::create($controller, __DIR__ . '/views')
+    ->handle($request);
+$view->render();
 ```
 
-実行するメッソドを指定することも可能です。
+`Dispatch`でセッション管理やCSRFトークンチェックなどを行ってます。
+
+実行するコントローラーのメソッド名は、下記のいずれかから決定します。
+
+- HTTPメソッド名から、
+- GET/POSTの「act」の値から、
+
+`onMethod`が呼ばれます。
+普通にアクセスすると「`onGet`」が呼ばれます。
+フォームでポストすれば「`onPost`」です。
+
+### Viewファイル
+
+サンプルコードの「`__DIR__ . '/views'`」がビュー用のディレクトリになります。
+
+ここに「`user.php`」を作成します。
 
 ```php
-$view = $app->execute( 'index' ); // onIndexが実行される
+use WScore\Pages\View\Data;
+/** @var Data $_view */
+
+$user = $_view->get('user');
+?>
+<!-- show user -->
 ```
 
-### ViewとHTML作成
+- `$this`はコントローラ・Dispatchから戻るオブジェクトです（`PaveView`）。
+- `$view`は描画用パラメーターなどを保持しているオブジェクトです（`Data`）。
 
-$viewはコントローラーで設定された値を保持しています。
-配列としてアクセスするとhtmlspecialcharsをかけてから
-値を返します。
+その他の機能
+----------
+
+### CSRFトークン
+
+`$view`オブジェクトからCSRFトークンを出力します。
 
 ```php
-echo $view['title'];        // 'Got A Data'と表示する
-$data = $view->get('data'); // データ配列を取得
-echo $view->getPass();      // idなどをhiddenタグを出力
-$view->is( '_method', 'get' );
+use WScore\Pages\View\Data;
+/** @var Data $_view */
+
+echo $_view->makeCsRfToken();
 ```
 
-直接データを取得するなら```get```を使います。
+ポストされた場合は、必ずCSRFトークンをチェックします。
+チェックに失敗した場合は、Criticalエラーとなります。
 
-その他、```is```などもあります。
+### Criticalエラー
+
+`PageView`の特殊なエラーです。
 
 ```php
-$view->is( '_current_method', 'get' );  // 今のHTTPメソッドをチェック。
-$view->is( '_method', 'get' );          // 次のメソッドをチェック。
+use WScore\Pages\PageView;
+/** @var PageView $view */
+
+if ($view->isCritical()) {
+    $view->setRender('critical.php');
+}
+$view->render();
 ```
 
-高度な機能
---------
+- [ ] コントローラーを実行する際に例外をキャッチしたら、Criticalエラーとする。
 
-### $viewを使った簡易的なエラー処理
+### メッセージとフラッシュ
 
-エラーが起きた時の処理です。コントローラー内で、
-適宜```critical```, ```error```, ```message```を
-使ってエラー状態を設定してください。
+コントローラーの`message`および`error`でメッセージを指定できます。
 
 ```php
-class MyController extends ControllerAbstract {
-    public function onGet($id) {
-        if( !$id ) {
-            $this->critical( 'no id!' ); // throws an exception.
-        }
-        if( !$data = $this->dao->find($id) ) {
-            $this->error( 'no such id: '.$id ); // set error message.
-        } else {
-            $this->message( 'found a data!' );  // show this message.
-        }
-        return [ 'title' => 'Got A Data!' ];
+use WScore\Pages\AbstractController;
+
+class MsgController extends AbstractController
+{
+    public function onGet()
+    {
+        $this->message('please try this demo!');
+        $this->error('maybe not!');
+        return $this->render('message.php');
     }
 }
+```
 
-// .... and in the php script...
+ビューPHPで、表示できます。
 
-$view = $app->execute('get');
+```php
+use WScore\Pages\PageView;
+/** @var PageView $view */
 
 echo $view->alert();
-if( $view->isCritical() ) {
-    // do nothing?
-} elseif( $view->isError() ) {
-    // do something?
-} else {
-    // do show some data?
-}
 ```
 
-表示は```alert```を使います。エラーによりスタイル・クラスが
-決まります。```is{Critical|Error}```でエラーが分かります。
-
-
-
-### C.S.R.F.トークン
-
-CSRF対策のためのトークンを生成＆確認します。
-例えば、beginController内で使うコードを書いてみます。
+### フラッシュメッセージ
 
 ```php
-class MyController extends ControllerAbstract
-    public function beginController( $method )
+use WScore\Pages\AbstractController;
+
+class MsgController extends AbstractController
+{
+    public function onGet()
     {
-        parent::beginController( $method );
-        if( in_array( $method, [ 'add', 'mod', 'del' ] ) ) {
-            $this->pushToken();
-        }
-        elseif( in_array( $method, [ 'post', 'put', 'delete' ] ) ) {
-            if( !$this->verifyToken() ) {
-                throw new \RuntimeException('cannot reload.' );
-            }
-        }
-    }
-}
-/// in html
-$view->getPass(); // トークンも一緒に出力される。
-```
-
-えぇと、beginControllerメソッドは、とにかく最初に必ず
-呼ばれるメソッドです。
-
-
-### フラッシュ・メッセージ
-
-フラッシュメッセージは```flash{Message|Error}```で
-セッションに設定し、次の画面で```setFlashMessage()```で
-読み込みます。読まなければ、メッセージは破棄されます。
-
-```php
-class MyController extends ControllerAbstract
-    public function onPut($id) {
-        if( $this->dao->update( $data ) {
-            $this->flashMessage( 'updated done!' );
-        } else {
-            $this->flashError( 'Ooops, not updated!!!' );
-        }
-        $this->location( '.../' ); // to onGet.
-    }
-    public function onGet($id) {
-        $this->setFlashMessage();
-    }
-}
-/// in html
-echo $view->alert(); // shows the flash message.
-```
-
-### HTTPメソッドでの自動設定
-
-HTMLで表示するタイトル、パンくず名、ボタンの名称、などなど
-メソッドが決まれば（ほぼ）一意に決まる設定が多くあります。
-設定を簡単にするため、HTTPメソッドを元にビューオブジェクト
-に自動で値を設定する機能があります。
-
-```php
-class MyController extends ControllerAbstract
-    protected $currentView = array(
-        // get data view
-        'modForm'    => [
-            '_method'        => 'put',
-            '_buttonValue'   => 'modify data',
-            '_subButtonType' => 'reset',
-            'curr_title'     => 'Modification Form',
-        ],
-        'put'     => [
-            '_method'        => 'index',
-            '_buttonValue'   => 'list data',
-            '_subButtonType' => 'none',
-            'curr_title'     => 'update complete',
-        ],
-    );
-    public function beginController( $method ) {
-        $this->setCurrentMethod( $method );
+        $this->flashMessage('thank you!');
+        $this->flashError('sorry!');
+        return $this->location('example.php');
     }
 }
 ```
 
-自動設定は、setCurrentMethodを使います。
-beginController内で実行していますので、オーバーロードする
-場合は、親クラスのbeginControllerを実行するか、自分で
-setCurrentMethodを実行してください。
+メッセージと同じPHPコードで、表示できます。
 
+
+### XSS対策
+
+t.b.w
+
+### HTMLフォーム
+
+t.b.w

@@ -177,7 +177,7 @@ class PageView
     public function render()
     {
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $view = $this->getContents();
+        $_view = $this->getContents();
         /** @noinspection PhpIncludeInspection */
         return include $this->viewRoot . '/' . $this->viewFile;
     }

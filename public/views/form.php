@@ -1,16 +1,18 @@
 <?php
 
 use WScore\Pages\PageView;
+use WScore\Pages\View\Data;
 
 /** @var PageView $this */
-$contents = $this->getContents();
+/** @var Data $_view */
 /** @var DemoForm $form */
-$form = $contents->get('form');
+$form = $_view->get('form');
+
 ?>
 <h1>this is form.</h1>
 
 <form action="" method="post">
-    <?= $contents->makeCsRfToken(); ?>
+    <?= $_view->makeCsRfToken(); ?>
     <div>
         <label for="user_name" class="form-label">User Name</label>
         <?= $form->userName(); ?>

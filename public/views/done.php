@@ -1,10 +1,12 @@
 <?php
 
 use WScore\Pages\PageView;
+use WScore\Pages\View\Data;
 
 /** @var PageView $this */
-$contents = $this->getContents();
-$form = $contents->get('demo');
+/** @var Data $_view */
+/** @var DemoValues $form */
+$form = $_view->get('demo');
 
 ?>
 <h1>this is done</h1>
