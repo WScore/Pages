@@ -22,3 +22,5 @@ $form = $contents->get('demo');
     <label for="comment" class="form-label">Comment</label>
     <?= $form->comment('comment'); ?>
 </div>
+
+<input type="button" value="back to demo's top page" onclick="location.href='/'">

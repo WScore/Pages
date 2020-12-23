@@ -48,7 +48,7 @@ class DemoController extends AbstractController
         $this->session()->set('inputs', false);
         $this->message('completed the demo!');
         return $this->render('done.php', [
-            'demo' => new DemoValues($result->getSafe(), []),
+            'demo' => new DemoValues($result->getSafe()),
             'test' => 'tested',
         ]);
     }

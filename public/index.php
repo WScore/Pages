@@ -52,6 +52,7 @@ if ($view->isCritical()) {
         }
         span.error {
             color: red;
+            display: block;
         }
     </style>
 </head>

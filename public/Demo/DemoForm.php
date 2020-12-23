@@ -19,8 +19,8 @@ class DemoForm
 
     public function __construct(array $values, array $errors = [])
     {
-        $this->values = new Values($values, $errors);
-        $this->forms = new Form($this->values);
+        $this->values = new Values($values);
+        $this->forms = new Form($this->values, $errors);
     }
 
     /**
@@ -54,6 +54,6 @@ class DemoForm
      */
     public function error($key)
     {
-        return $this->values->error($key);
+        return $this->forms->error($key);
     }
 }

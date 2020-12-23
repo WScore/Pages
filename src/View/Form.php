@@ -11,9 +11,15 @@ class Form
      */
     private $values;
 
-    public function __construct(Values $values)
+    /**
+     * @var array
+     */
+    private $errors;
+
+    public function __construct(Values $values, array $errors = [])
     {
         $this->values = $values;
+        $this->errors = $errors;
     }
 
     /**
@@ -48,7 +54,7 @@ class Form
                 ->addAttribute('type', $type)
                 ->addAttribute('name', $key)
                 ->addAttribute('value', $k);
-            if (in_array($val, $values)) {
+            if (in_array($k, $values)) {
                 $input->addAttribute('checked', 'checked');
             }
             $label = Tag::create('label')
@@ -89,5 +95,33 @@ class Form
             ->addAttribute('id', $key)
             ->addContents($value)
             ->hasCloseTag();
+    }
+
+    public function getRawError($key)
+    {
+        return array_key_exists($key, $this->errors)
+            ? $this->errors[$key]
+            : '';
+    }
+
+    /**
+     * @param string $message
+     * @return string
+     */
+    protected function makeErrorMessage($message)
+    {
+        return "<span class=\"error\">{$message}</span>";
+    }
+
+    /**
+     * @param string $key
+     * @return string
+     */
+    public function error($key)
+    {
+        if ($error = $this->getRawError($key)) {
+            return $this->makeErrorMessage($error);
+        }
+        return '';
     }
 }

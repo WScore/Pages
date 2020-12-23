@@ -5,11 +5,6 @@ use WScore\Pages\View\Values;
 
 class DemoValues extends Values
 {
-    public function __construct(array $values, array $errors)
-    {
-        parent::__construct($values, $errors);
-    }
-
     /**
      * @return string
      */
@@ -17,10 +12,7 @@ class DemoValues extends Values
     {
         $value = $this->getRaw('gender');
         $choices = GenderType::choices();
-        if (!isset($choices[$value])) {
-            return $this->makeErrorMessage('invalid value: ' . $value);
-        }
-        return $choices[$value] . $this->error('gender');
+        return $choices[$value];
     }
 
     /**
