@@ -24,7 +24,7 @@ class DemoController extends AbstractController
                 'form' => new DemoForm($result->getAll(), $result->getMessages()),
             ]);
         }
-        $this->setFlash('inputs', $inputs);
+        $this->session()->set('inputs', $inputs);
         $this->message('please proceed to done!');
         return $this->render('confirm.php', [
             'demo' => new DemoValues($result->getSafe(), []),
@@ -34,9 +34,9 @@ class DemoController extends AbstractController
 
     public function onDone()
     {
-        $inputs = $this->getFlash('inputs');
+        $inputs = $this->session()->get('inputs');
         if (!$inputs) {
-            $this->flashError('failed validate input!');
+            $this->flashError('no inputs! Maybe refreshed done page??');
             $this->location('/');
         }
         $validation = new DemoValidation();
@@ -45,6 +45,7 @@ class DemoController extends AbstractController
             $this->flashError('failed validate input!');
             $this->location('/');
         }
+        $this->session()->set('inputs', false);
         $this->message('completed the demo!');
         return $this->render('done.php', [
             'demo' => new DemoValues($result->getSafe(), []),

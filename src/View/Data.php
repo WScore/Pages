@@ -100,29 +100,4 @@ class Data
     {
         return $this->makeHiddenTag(PageView::CSRF_TOKEN );
     }
-
-    // +----------------------------------------------------------------------+
-    //  managing errors and messages.
-    //  should this be a different class?
-    // +----------------------------------------------------------------------+
-
-    /**
-     * @return string
-     */
-    public function alert()
-    {
-        $html = $this->view->getMessage();
-        if( !$html ) return $html;
-        if( $this->view->isCritical() ) {
-            $html = "<strong>Critical Error:</strong><br/>\n{$html}";
-            $class = 'alert alert-danger';
-        } elseif( $this->view->isError() ) {
-            $html = "<strong>Error:</strong><br/>\n{$html}";
-            $class = 'alert alert-danger';
-        } else {
-            $class = 'alert alert-success';
-        }
-        $html  = "<div class=\"{$class}\">\n{$html}\n</div>";
-        return $html;
-    }
 }

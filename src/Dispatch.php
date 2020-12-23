@@ -2,6 +2,7 @@
 
 namespace WScore\Pages;
 
+use Aura\Session\Segment;
 use Aura\Session\Session;
 use Aura\Session\SessionFactory;
 use Exception;
@@ -43,19 +44,23 @@ class Dispatch
      */
     private $action = 'act';
 
-    // +----------------------------------------------------------------------+
-    //  construction of dispatch and setting controller object.
-    // +----------------------------------------------------------------------+
+    /**
+     * @var Segment
+     */
+    private $segment;
+
     /**
      * @param AbstractController $controller
      * @param PageView $view
      * @param Session $session
+     * @param Segment $segment
      */
-    public function __construct($controller, $view, $session)
+    public function __construct($controller, $view, $session, $segment)
     {
         $this->view = $view;
         $this->session = $session;
         $this->controller = $controller;
+        $this->segment = $segment;
         $this->setController($this->controller);
     }
 
@@ -68,9 +73,10 @@ class Dispatch
     {
         $factory = new SessionFactory();
         $session = $factory->newInstance($_COOKIE);
-        $view = new PageView($session, $viewRoot);
+        $segment = $session->getSegment('app');
+        $view = new PageView($session, $segment, $viewRoot);
 
-        return new Dispatch($controller, $view, $session);
+        return new Dispatch($controller, $view, $session, $segment);
     }
 
     /**
@@ -79,7 +85,7 @@ class Dispatch
     protected function setController($controller)
     {
         $controller->inject(AbstractController::VIEWER, $this->view);
-        $controller->inject(AbstractController::SESSION, $this->session->getSegment('app'));
+        $controller->inject(AbstractController::SESSION, $this->segment);
         $this->controller = $controller;
     }
 

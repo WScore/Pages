@@ -4,6 +4,8 @@ use WScore\Pages\PageView;
 
 /** @var PageView $this */
 $contents = $this->getContents();
+$form = $contents->get('demo');
+
 ?>
 <h1>this is done</h1>
 

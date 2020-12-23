@@ -2,6 +2,8 @@
 
 namespace WScore\Pages;
 
+use App\Application\Middleware\SessionMiddleware;
+use Aura\Session\Segment;
 use Aura\Session\Session;
 use WScore\Pages\View\Data;
 
@@ -12,6 +14,7 @@ use WScore\Pages\View\Data;
  */
 class PageView
 {
+    const SUCCESS = '200';
     const ERROR = '400';
     const CRITICAL = '500';
 
@@ -22,7 +25,7 @@ class PageView
      *
      * @var bool
      */
-    protected $error = false;
+    protected $error = self::SUCCESS;
 
     /**
      * @var string
@@ -40,22 +43,29 @@ class PageView
     private $viewRoot;
 
     /**
-     * @var Session
-     */
-    private $session;
-
-    /**
      * @var string
      */
     private $viewFile;
 
     /**
+     * @var Segment
+     */
+    private $segment;
+
+    /**
+     * @var Session
+     */
+    private $session;
+
+    /**
      * @param Session $session
+     * @param Segment $segment
      * @param string $viewRoot
      */
-    public function __construct($session, $viewRoot)
+    public function __construct($session, $segment, $viewRoot)
     {
         $this->viewRoot = $viewRoot;
+        $this->segment = $segment;
         $this->session = $session;
     }
 
@@ -139,6 +149,24 @@ class PageView
     }
 
     /**
+     * @return string[]
+     */
+    public function getFlashMessages()
+    {
+        $messages = $this->segment->getFlash('messages');
+        return (array) ($messages ? $messages : []);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getFlashNotices()
+    {
+        $messages = $this->segment->getFlash('notices');
+        return (array) ($messages ? $messages : []);
+    }
+
+    /**
      * @return string
      */
     public function getMessage()
@@ -152,5 +180,40 @@ class PageView
         $view = $this->getContents();
         /** @noinspection PhpIncludeInspection */
         return include $this->viewRoot . '/' . $this->viewFile;
+    }
+
+    public function alert()
+    {
+        $html = '';
+        // show critical error.
+        if( $this->isCritical() ) {
+            $html .= $this->alertDiv($this->message, self::CRITICAL);
+        }
+        // show error from flash.
+        foreach ($this->getFlashNotices() as $msg) {
+            $html .= $this->alertDiv($msg, self::ERROR);
+        }
+        // show message from flash.
+        foreach ($this->getFlashMessages() as $msg) {
+            $html .= $this->alertDiv($msg, self::SUCCESS);
+        }
+        // show message
+        $html .= $this->alertDiv($this->message, $this->error);
+
+        return $html;
+    }
+
+    private function alertDiv($msg, $errLevel)
+    {
+        if (!$msg) return '';
+
+        $classByLevel = [
+            self::CRITICAL => 'alert alert-danger',
+            self::ERROR => 'alert alert-danger',
+            self::SUCCESS => 'alert alert-success',
+        ];
+        $class = isset($classByLevel[$errLevel]) ? $classByLevel[$errLevel] : 'alert alert-danger';
+
+        return "<div class=\"{$class}\">\n{$msg}\n</div>";
     }
 }

@@ -107,6 +107,7 @@ abstract class AbstractController
      */
     protected function render($viewFile, $contents = [])
     {
+        $this->session()->clearFlash(); // rendering a view means ...
         $this->pageView()->setRender($viewFile, $contents);
 
         return $this->pageView();
@@ -139,8 +140,9 @@ abstract class AbstractController
      */
     protected function flashMessage($message)
     {
-        $this->session()->setFlash('flash-message', $message);
-        $this->session()->setFlash('flash-error', false);
+        $messages = (array) $this->session()->getFlash('messages', []);
+        $messages[] = $message;
+        $this->session()->setFlashNow('messages', $messages);
     }
 
     /**
@@ -148,8 +150,9 @@ abstract class AbstractController
      */
     protected function flashError($message)
     {
-        $this->session()->setFlash('flash-message', $message);
-        $this->session()->setFlash('flash-error', true);
+        $messages = (array) $this->session()->getFlash('notices', []);
+        $messages[] = $message;
+        $this->session()->setFlashNow('notices', $messages);
     }
 
     /**

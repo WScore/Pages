@@ -60,7 +60,7 @@ if ($view->isCritical()) {
     <a href="/">this is header</a>
 </header>
 <?php
-echo $view->getContents()->alert();
+echo $view->alert();
 
 $view->render();
 ?>
