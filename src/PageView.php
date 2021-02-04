@@ -185,10 +185,6 @@ class PageView
     public function alert()
     {
         $html = '';
-        // show critical error.
-        if( $this->isCritical() ) {
-            $html .= $this->alertDiv($this->message, self::CRITICAL);
-        }
         // show error from flash.
         foreach ($this->getFlashNotices() as $msg) {
             $html .= $this->alertDiv($msg, self::ERROR);
