@@ -5,19 +5,19 @@ use WScore\Pages\Request;
 
 require_once( dirname(__DIR__).'/autoload.php' );
 
-class RequestUA_Test extends \PHPUnit_Framework_TestCase
+class RequestUA_Test extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Request
      */
     var $req;
 
-    static function setupBeforeClass()
+    public static function setUpBeforeClass() : void
     {
         class_exists( 'WScore\Pages\Request' );
     }
 
-    function setup()
+    protected function setUp() : void
     {
         $this->req = new Request();
         $_SERVER['REQUEST_METHOD'] = 'get';

@@ -5,14 +5,14 @@ use WScore\Pages\PageView;
 
 require_once( dirname(__DIR__).'/autoload.php' );
 
-class PageView_Test extends \PHPUnit_Framework_TestCase
+class PageView_Test extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PageView
      */
     var $view;
 
-    public function setup()
+    protected function setUp() : void
     {
         $this->view = new PageView();
     }

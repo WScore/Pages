@@ -4,11 +4,12 @@ namespace tests\pages;
 use tests\pages\mocks\TestController;
 use WScore\Pages\Dispatch;
 use WScore\Pages\Factory;
+use WScore\Pages\PageView;
 
 require_once( dirname(__DIR__).'/autoload.php' );
 require_once( __DIR__ . '/mocks/TestController.php' );
 
-class Dispatch_FunctionTest extends \PHPUnit_Framework_TestCase
+class Dispatch_FunctionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var TestController
@@ -19,8 +20,8 @@ class Dispatch_FunctionTest extends \PHPUnit_Framework_TestCase
      * @var Dispatch
      */
     var $d;
-    
-    function setup()
+
+    protected function setUp() : void
     {
         $this->buildDispatcher();
     }
@@ -29,7 +30,6 @@ class Dispatch_FunctionTest extends \PHPUnit_Framework_TestCase
     {
         $_REQUEST = array();
         $this->c = new TestController();
-        $this->d = Factory::getDispatch( $this->c );
     }
     
     function test0()
